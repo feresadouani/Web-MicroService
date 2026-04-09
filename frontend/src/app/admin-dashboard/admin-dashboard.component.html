@@ -1,0 +1,63 @@
+<div class="dashboard-layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems">
+  </app-sidebar>
+
+  <section class="dashboard-content">
+    <app-navbar></app-navbar>
+
+    <section class="page-header">
+      <h1>Dashboard</h1>
+    </section>
+
+    <div class="kpi-grid">
+      <article class="card" *ngFor="let kpi of kpis">
+        <div class="kpi-head">
+          <p class="card-title">{{ kpi.title }}</p>
+          <span class="kpi-icon">{{ kpi.icon }}</span>
+        </div>
+        <h3>{{ kpi.value }}</h3>
+        <small class="trend positive">{{ kpi.trend }}</small>
+      </article>
+    </div>
+
+    <article class="card chart-card">
+      <h3>Revenue Trend</h3>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 900 230" preserveAspectRatio="none">
+          <polyline points="0,160 120,150 240,155 360,145 480,110 600,120 720,112 900,95" fill="none" stroke="#34d399"
+            stroke-width="3" />
+          <polyline points="0,230 0,160 120,150 240,155 360,145 480,110 600,120 720,112 900,95 900,230"
+            fill="rgba(52,211,153,0.12)" stroke="none" />
+        </svg>
+      </div>
+    </article>
+
+    <div class="content-grid">
+      <article class="card">
+        <h3>Recent Activity</h3>
+        <div class="list">
+          <div class="list-item" *ngFor="let activity of activities">
+            <strong>{{ activity.title }}</strong>
+            <p>{{ activity.description }}</p>
+            <small>{{ activity.time }}</small>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Upcoming Tasks</h3>
+        <div class="list">
+          <label class="task-item" *ngFor="let task of tasks">
+            <input type="checkbox" />
+            <span>
+              <strong>{{ task.title }}</strong>
+              <small>{{ task.date }}</small>
+            </span>
+          </label>
+        </div>
+      </article>
+    </div>
+
+    <app-footer [text]="'© 2026, The Compilers'"></app-footer>
+  </section>
+</div>

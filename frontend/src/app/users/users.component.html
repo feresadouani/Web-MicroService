@@ -1,0 +1,93 @@
+<div class="users-layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems">
+  </app-sidebar>
+
+  <section class="users-content">
+    <app-navbar></app-navbar>
+
+    <section class="header-row">
+      <div>
+        <h1>Users</h1>
+      </div>
+      <button type="button" class="primary-btn" (click)="toggleCreateForm()">
+        {{ showCreateForm ? 'Fermer le formulaire' : 'Ajouter un user' }}
+      </button>
+    </section>
+
+    <article class="card" *ngIf="editingUser">
+      <h3>Modifier l’utilisateur</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); saveEdit();">
+        <input [(ngModel)]="editingUser.firstname" name="edit-firstname" placeholder="Firstname" required />
+        <input [(ngModel)]="editingUser.lastname" name="edit-lastname" placeholder="Lastname" required />
+        <input [(ngModel)]="editingUser.email" name="edit-email" type="email" placeholder="Email" required />
+        <input
+          [(ngModel)]="editingUser.password"
+          name="edit-password"
+          type="password"
+          placeholder="Nouveau mot de passe (optionnel)"
+        />
+        <select [(ngModel)]="editingUser.role" name="edit-role">
+          <option value="USER">USER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+        <div class="form-actions-inline">
+          <button type="submit" class="primary-btn">Enregistrer</button>
+          <button type="button" class="ghost-btn" (click)="cancelEdit()">Annuler</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="card" *ngIf="showCreateForm">
+      <h3>Nouveau user</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); createUser();">
+        <input [(ngModel)]="newUser.firstname" name="firstname" placeholder="Firstname" required />
+        <input [(ngModel)]="newUser.lastname" name="lastname" placeholder="Lastname" required />
+        <input [(ngModel)]="newUser.email" name="email" type="email" placeholder="Email" required />
+        <input [(ngModel)]="newUser.password" name="password" type="password" placeholder="Password" required />
+        <select [(ngModel)]="newUser.role" name="role">
+          <option value="USER">USER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+        <button type="submit" class="primary-btn">Créer</button>
+      </form>
+    </article>
+
+    <article class="card">
+      <div class="table-header">
+        <h3>Liste des users</h3>
+        <button type="button" class="ghost-btn" (click)="fetchUsers()">Rafraichir</button>
+      </div>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p *ngIf="loading">Chargement...</p>
+
+      <table *ngIf="!loading">
+        <thead>
+          <tr>
+            <th>Firstname</th>
+            <th>Lastname</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.firstname }}</td>
+            <td>{{ user.lastname }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role || 'USER' }}</td>
+            <td class="col-actions">
+              <div class="row-actions">
+                <button type="button" class="ghost-btn btn-sm" (click)="startEdit(user)">Modifier</button>
+                <button type="button" class="danger-btn btn-sm" (click)="deleteUser(user)">Supprimer</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+
+    <app-footer [text]="'© 2025 Users Administration'"></app-footer>
+  </section>
+</div>

@@ -1,0 +1,24 @@
+<header class="topbar">
+  <div class="left">
+    <form class="search" (submit)="$event.preventDefault()">
+      <input type="search" [(ngModel)]="searchQuery" name="searchQuery" placeholder="Search..." />
+    </form>
+  </div>
+
+  <div class="right">
+    <button class="account-button" type="button" (click)="toggleAccountDropdown($event)">
+      <span class="avatar">⌁</span>
+      <span class="account-text">{{ userName }}</span>
+      <span class="caret">▾</span>
+    </button>
+
+    <div class="dropdown" *ngIf="accountDropdownOpen">
+      <div class="dropdown-user">
+        <strong>{{ userName }}</strong>
+        <small>{{ userEmail }}</small>
+      </div>
+      <button type="button" class="dropdown-item">Billing</button>
+      <button type="button" class="dropdown-item danger" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</header>

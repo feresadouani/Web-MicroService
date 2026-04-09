@@ -1,0 +1,15 @@
+<aside class="sidebar">
+  <h2>{{ title }}</h2>
+  <nav>
+    <ng-container *ngFor="let item of items">
+      <a
+        *ngIf="item.route?.length"
+        [routerLink]="item.route!"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }">
+        {{ item.label }}
+      </a>
+      <span *ngIf="!item.route?.length" class="nav-placeholder">{{ item.label }}</span>
+    </ng-container>
+  </nav>
+</aside>

@@ -1,0 +1,13 @@
+<div class="portal">
+  <header class="portal-header">
+    <h1>Espace utilisateur</h1>
+    <button type="button" class="logout-btn" (click)="logout()">Déconnexion</button>
+  </header>
+  <p class="intro">
+    Bienvenue. Cet espace correspond au rôle Keycloak <strong>client_user</strong>
+    (les comptes <strong>client_admin</strong> sont redirigés vers le tableau de bord).
+  </p>
+  <p class="hint" *ngIf="!isClientUser">
+    Attention : aucun rôle <strong>client_user</strong> n’a été détecté sur votre jeton — contrôlez la configuration du client <strong>frontend</strong> dans Keycloak.
+  </p>
+</div>
