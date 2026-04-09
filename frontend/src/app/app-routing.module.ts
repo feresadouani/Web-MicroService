@@ -1,7 +1,29 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { UsersComponent } from './users/users.component';
+import { PostLoginRedirectComponent } from './post-login-redirect/post-login-redirect.component';
+import { UserPortalComponent } from './user-portal/user-portal.component';
+import { AdminGuard } from './guards/admin.guard';
 
-const routes: Routes = [];
+const routes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    component: PostLoginRedirectComponent
+  },
+  { path: 'portal', component: UserPortalComponent },
+  {
+    path: 'admin',
+    canActivateChild: [AdminGuard],
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      { path: 'dashboard', component: AdminDashboardComponent },
+      { path: 'users', component: UsersComponent }
+    ]
+  },
+  { path: '**', redirectTo: '' }
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
