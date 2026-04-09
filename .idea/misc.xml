@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/Config/pom.xml" />
         <option value="$PROJECT_DIR$/event/pom.xml" />
         <option value="$PROJECT_DIR$/events/pom.xml" />
+        <option value="$PROJECT_DIR$/user/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
