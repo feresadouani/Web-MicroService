@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -73,7 +73,15 @@ export class UserApiService {
     return this.http.get(`${this.gatewayBaseUrl}/users/me`);
   }
 
-  getUsers(): Observable<UserDto[]> {
+  /**
+   * Liste des utilisateurs (HAL). Avec {@code search}, appelle l’API de recherche admin (JSON tableau).
+   */
+  getUsers(search?: string | null): Observable<UserDto[]> {
+    const q = search?.trim();
+    if (q) {
+      const params = new HttpParams().set('q', q);
+      return this.http.get<UserDto[]>(`${this.gatewayBaseUrl}/users/admin/search`, { params });
+    }
     return this.http.get<HalUsersResponse>(`${this.gatewayBaseUrl}/users`).pipe(
       map((body) => (body._embedded?.users ?? []).map((u) => normalizeUserFromHal(u)))
     );

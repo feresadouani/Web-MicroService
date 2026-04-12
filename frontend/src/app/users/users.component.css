@@ -55,6 +55,22 @@
   align-items: center;
 }
 
+.search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.search-row input[type='search'] {
+  flex: 1 1 220px;
+  min-width: 0;
+  border: 1px solid #dbe2ea;
+  border-radius: 8px;
+  padding: 9px 10px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
