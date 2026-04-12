@@ -58,6 +58,18 @@
         <button type="button" class="ghost-btn" (click)="fetchUsers()">Rafraichir</button>
       </div>
 
+      <form class="search-row" (submit)="$event.preventDefault(); fetchUsers();">
+        <input
+          [(ngModel)]="searchQuery"
+          name="user-search"
+          type="search"
+          placeholder="Rechercher (prénom, nom, email)…"
+          autocomplete="off"
+        />
+        <button type="submit" class="primary-btn">Rechercher</button>
+        <button type="button" class="ghost-btn" (click)="clearSearch()">Réinitialiser</button>
+      </form>
+
       <p class="error" *ngIf="error">{{ error }}</p>
       <p *ngIf="loading">Chargement...</p>
 
@@ -88,6 +100,6 @@
       </table>
     </article>
 
-    <app-footer [text]="'© 2025 Users Administration'"></app-footer>
+    <app-footer [text]="'© 2026 Users Administration'"></app-footer>
   </section>
 </div>

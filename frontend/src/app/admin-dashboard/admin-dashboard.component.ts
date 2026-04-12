@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { SidebarItem } from '../layout/sidebar/sidebar.component';
+import { UserApiService, UserDto } from '../services/user-api.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -11,6 +12,14 @@ export class AdminDashboardComponent {
     { label: 'Dashboard', route: ['/admin', 'dashboard'] },
     { label: 'Users', route: ['/admin', 'users'] },
   ];
+
+  userSearchQuery = '';
+  userSearchResults: UserDto[] = [];
+  userSearchLoading = false;
+  userSearchError = '';
+  userSearchAttempted = false;
+
+  constructor(private readonly userApi: UserApiService) {}
 
   kpis = [
     { title: 'Total Contacts', value: '1,234', trend: '+12% from last month', icon: '👥' },
@@ -30,4 +39,27 @@ export class AdminDashboardComponent {
     { title: 'Send proposal', date: 'Tomorrow at 10:00 AM' },
     { title: 'Review contracts', date: 'Friday at 3:00 PM' }
   ];
+
+  searchUsers(): void {
+    this.userSearchAttempted = true;
+    this.userSearchLoading = true;
+    this.userSearchError = '';
+    this.userApi.getUsers(this.userSearchQuery || undefined).subscribe({
+      next: (users) => {
+        this.userSearchResults = users;
+        this.userSearchLoading = false;
+      },
+      error: (err) => {
+        this.userSearchError = `Erreur recherche: ${err.status} ${err.statusText ?? ''}`;
+        this.userSearchLoading = false;
+      }
+    });
+  }
+
+  clearUserSearch(): void {
+    this.userSearchQuery = '';
+    this.userSearchResults = [];
+    this.userSearchError = '';
+    this.userSearchAttempted = false;
+  }
 }

@@ -9,6 +9,40 @@
       <h1>Dashboard</h1>
     </section>
 
+    <article class="card user-search-card">
+      <h3>Recherche utilisateur</h3>
+      <p class="muted">Filtre côté serveur sur le prénom, le nom ou l’email.</p>
+      <form class="search-row" (submit)="$event.preventDefault(); searchUsers();">
+        <input
+          [(ngModel)]="userSearchQuery"
+          name="dash-user-search"
+          type="search"
+          placeholder="Prénom, nom ou email…"
+          autocomplete="off"
+        />
+        <button type="submit" class="primary-btn">Rechercher</button>
+        <button type="button" class="ghost-btn" (click)="clearUserSearch()">Effacer</button>
+      </form>
+      <p class="error" *ngIf="userSearchError">{{ userSearchError }}</p>
+      <p *ngIf="userSearchLoading">Chargement…</p>
+      <ul class="mini-user-list" *ngIf="!userSearchLoading && userSearchResults.length">
+        <li *ngFor="let u of userSearchResults | slice : 0 : 8">
+          <span class="mini-name">{{ u.firstname }} {{ u.lastname }}</span>
+          <span class="mini-email">{{ u.email }}</span>
+          <span class="mini-role">{{ u.role || 'USER' }}</span>
+        </li>
+      </ul>
+      <p class="muted more-link" *ngIf="!userSearchLoading && userSearchResults.length > 8">
+        <a routerLink="/admin/users">Ouvrir la page Users pour la liste complète →</a>
+      </p>
+      <p
+        class="muted"
+        *ngIf="userSearchAttempted && !userSearchLoading && !userSearchError && userSearchResults.length === 0"
+      >
+        Aucun utilisateur ne correspond à cette recherche.
+      </p>
+    </article>
+
     <div class="kpi-grid">
       <article class="card" *ngFor="let kpi of kpis">
         <div class="kpi-head">

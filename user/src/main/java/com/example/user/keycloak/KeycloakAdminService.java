@@ -1,0 +1,283 @@
+package com.example.user.keycloak;
+
+import com.example.user.Entity.User;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClient;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Création d’utilisateurs Keycloak après ajout en base, et détection des comptes déjà présents (inscription KC).
+ */
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class KeycloakAdminService {
+
+    private final KeycloakAdminProperties props;
+    private final ObjectMapper objectMapper;
+
+    /** Mot de passe en clair mémorisé dans {@code onBeforeCreate} (perdu ou hashé sur l’entité après persist). */
+    private final ConcurrentHashMap<String, String> plainPasswordByEmail = new ConcurrentHashMap<>();
+
+    public void stashPlainPasswordForNewUser(String email, String rawPassword) {
+        if (email == null || email.isBlank() || rawPassword == null || rawPassword.isBlank()) {
+            return;
+        }
+        plainPasswordByEmail.put(emailKey(email), rawPassword);
+    }
+
+    public void clearStashedPlainPassword(String email) {
+        if (email != null && !email.isBlank()) {
+            plainPasswordByEmail.remove(emailKey(email));
+        }
+    }
+
+    /**
+     * Appelé après {@code save} sur {@link User} (ex. POST Data REST).
+     * Si l’email existe déjà dans Keycloak (ex. utilisateur venant de s’inscrire), on n’essaie pas de recréer.
+     */
+    public void syncUserToKeycloakAfterPersist(User user) {
+        if (!props.isEnabled()) {
+            log.debug("Keycloak : synchronisation désactivée (keycloak.admin.enabled=false).");
+            return;
+        }
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            log.warn("Keycloak : email vide, sync ignorée.");
+            return;
+        }
+        try {
+            String token = fetchAdminAccessToken();
+            String email = user.getEmail().trim();
+            if (keycloakUserExists(email, token)) {
+                log.info("Keycloak : utilisateur déjà présent pour {}, pas de création.", email);
+                return;
+            }
+            String plain = resolvePlainPassword(user);
+            if (plain == null || plain.isBlank()) {
+                throw new IllegalStateException(
+                        "Mot de passe obligatoire pour créer l’utilisateur dans Keycloak (vérifiez le formulaire / JSON).");
+            }
+            String userId = createKeycloakUser(user, plain, token);
+            assignFrontendClientRole(userId, resolveKeycloakRole(user.getRole()), token);
+            log.info("Keycloak : utilisateur créé pour {} (id={})", email, userId);
+        } catch (Exception e) {
+            log.error("Keycloak : échec sync pour {} : {}", user.getEmail(), e.getMessage(), e);
+            throw new RuntimeException("Impossible de créer l’utilisateur dans Keycloak : " + e.getMessage(), e);
+        }
+    }
+
+    private String resolvePlainPassword(User user) {
+        String key = emailKey(user.getEmail());
+        String stashed = plainPasswordByEmail.get(key);
+        if (stashed != null && !stashed.isBlank()) {
+            return stashed;
+        }
+        String p = user.getPassword();
+        if (p != null && !p.isBlank()) {
+            return p;
+        }
+        return null;
+    }
+
+    private static String emailKey(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String resolveKeycloakRole(String appRole) {
+        if (appRole != null && appRole.equalsIgnoreCase("ADMIN")) {
+            return "client_admin";
+        }
+        return "client_user";
+    }
+
+    private RestClient client() {
+        return RestClient.builder().baseUrl(props.getServerUrl()).build();
+    }
+
+    private String fetchAdminAccessToken() throws Exception {
+        String realm = props.getTokenRealm();
+        String form;
+        if ("client_credentials".equalsIgnoreCase(props.getGrantType())) {
+            if (props.getTokenClientId() == null || props.getTokenClientId().isBlank()
+                    || props.getTokenClientSecret() == null || props.getTokenClientSecret().isBlank()) {
+                throw new IllegalStateException(
+                        "grant-type=client_credentials : renseignez keycloak.admin.token-client-id et token-client-secret.");
+            }
+            form = "grant_type=client_credentials"
+                    + "&client_id=" + urlEncode(props.getTokenClientId())
+                    + "&client_secret=" + urlEncode(props.getTokenClientSecret());
+        } else {
+            form = "grant_type=password"
+                    + "&client_id=admin-cli"
+                    + "&username=" + urlEncode(props.getUsername())
+                    + "&password=" + urlEncode(props.getPassword());
+        }
+
+        final String raw;
+        try {
+            raw = client().post()
+                    .uri("/realms/{realm}/protocol/openid-connect/token", realm)
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(form)
+                    .retrieve()
+                    .body(String.class);
+        } catch (HttpStatusCodeException e) {
+            if (e.getStatusCode().value() == 400) {
+                String body = e.getResponseBodyAsString();
+                String hint = """
+                        Jeton admin Keycloak refusé (400).
+                        • Si grant-type=password : vérifiez keycloak.admin.username et keycloak.admin.password (mot de passe réel du compte admin Keycloak, celui défini à l’installation ou dans la console).
+                          Dans Keycloak : realm master → Clients → admin-cli → activer « Direct access grants ».
+                        • Ou passez à keycloak.admin.grant-type=client_credentials avec un client confidentiel (service account) ayant les rôles realm-management sur le realm cible.
+                        Réponse Keycloak : """
+                        + body;
+                throw new IllegalStateException(hint.trim(), e);
+            }
+            throw e;
+        }
+        JsonNode root = objectMapper.readTree(raw);
+        if (!root.has("access_token")) {
+            throw new IllegalStateException("Réponse token Keycloak sans access_token : " + raw);
+        }
+        return root.get("access_token").asText();
+    }
+
+    private static String urlEncode(String s) {
+        return URLEncoder.encode(s, StandardCharsets.UTF_8);
+    }
+
+    private boolean keycloakUserExists(String email, String token) {
+        String json = client().get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/admin/realms/{realm}/users")
+                        .queryParam("email", email.trim())
+                        .queryParam("exact", true)
+                        .build(props.getTargetRealm()))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .retrieve()
+                .body(String.class);
+        try {
+            JsonNode arr = objectMapper.readTree(json);
+            return arr.isArray() && !arr.isEmpty();
+        } catch (Exception e) {
+            log.warn("Keycloak : lecture réponse recherche utilisateur : {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private String createKeycloakUser(User user, String plainPassword, String token) throws Exception {
+        Map<String, Object> body = new LinkedHashMap<>();
+        String email = user.getEmail().trim();
+        body.put("username", email);
+        body.put("email", email);
+        body.put("firstName", Optional.ofNullable(user.getFirstname()).orElse(""));
+        body.put("lastName", Optional.ofNullable(user.getLastname()).orElse(""));
+        body.put("enabled", true);
+        body.put("emailVerified", true);
+        List<Map<String, Object>> credentials = new ArrayList<>();
+        credentials.add(Map.of(
+                "type", "password",
+                "value", plainPassword,
+                "temporary", false));
+        body.put("credentials", credentials);
+
+        try {
+            ResponseEntity<Void> created = client().post()
+                    .uri("/admin/realms/{realm}/users", props.getTargetRealm())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                    .body(body)
+                    .retrieve()
+                    .toEntity(Void.class);
+            if (!created.getStatusCode().is2xxSuccessful()) {
+                throw new IllegalStateException("Création Keycloak HTTP " + created.getStatusCode());
+            }
+        } catch (HttpStatusCodeException e) {
+            if (e.getStatusCode().value() == 409) {
+                throw new IllegalStateException("Utilisateur déjà existant dans Keycloak (409).", e);
+            }
+            throw e;
+        }
+
+        // Localiser l’ID : recherche exacte après création
+        String listJson = client().get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/admin/realms/{realm}/users")
+                        .queryParam("email", email)
+                        .queryParam("exact", true)
+                        .build(props.getTargetRealm()))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .retrieve()
+                .body(String.class);
+        JsonNode arr = objectMapper.readTree(listJson);
+        if (!arr.isArray() || arr.isEmpty() || !arr.get(0).has("id")) {
+            throw new IllegalStateException("Utilisateur Keycloak créé mais introuvable par email.");
+        }
+        return arr.get(0).get("id").asText();
+    }
+
+    private void assignFrontendClientRole(String keycloakUserId, String roleName, String token) throws Exception {
+        String clientUuid = resolveFrontendClientUuid(token);
+        String rolesJson = client().get()
+                .uri("/admin/realms/{realm}/clients/{id}/roles", props.getTargetRealm(), clientUuid)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .retrieve()
+                .body(String.class);
+        JsonNode roles = objectMapper.readTree(rolesJson);
+        JsonNode roleNode = null;
+        if (roles.isArray()) {
+            for (JsonNode r : roles) {
+                if (r.has("name") && roleName.equals(r.get("name").asText())) {
+                    roleNode = r;
+                    break;
+                }
+            }
+        }
+        if (roleNode == null) {
+            throw new IllegalStateException(
+                    "Rôle Keycloak introuvable sur le client '" + props.getFrontendClientId() + "' : " + roleName);
+        }
+        Map<String, Object> roleMap = objectMapper.convertValue(roleNode, new TypeReference<>() {
+        });
+        client().post()
+                .uri("/admin/realms/{realm}/users/{userId}/role-mappings/clients/{cid}",
+                        props.getTargetRealm(), keycloakUserId, clientUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .body(List.of(roleMap))
+                .retrieve()
+                .toEntity(Void.class);
+    }
+
+    private String resolveFrontendClientUuid(String token) throws Exception {
+        String path = "/admin/realms/{realm}/clients?clientId={cid}";
+        String json = client().get()
+                .uri(path, props.getTargetRealm(), props.getFrontendClientId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .retrieve()
+                .body(String.class);
+        JsonNode arr = objectMapper.readTree(json);
+        if (!arr.isArray() || arr.isEmpty() || !arr.get(0).has("id")) {
+            throw new IllegalStateException("Client Keycloak introuvable : " + props.getFrontendClientId());
+        }
+        return arr.get(0).get("id").asText();
+    }
+}

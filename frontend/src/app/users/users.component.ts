@@ -17,6 +17,8 @@ export class UsersComponent implements OnInit {
   loading = false;
   showCreateForm = false;
   error = '';
+  /** Filtre de recherche (prénom, nom, email) envoyé au backend */
+  searchQuery = '';
 
   newUser: CreateUserPayload = {
     firstname: '',
@@ -38,7 +40,7 @@ export class UsersComponent implements OnInit {
   fetchUsers(): void {
     this.loading = true;
     this.error = '';
-    this.userApiService.getUsers().subscribe({
+    this.userApiService.getUsers(this.searchQuery).subscribe({
       next: (users) => {
         this.users = users;
         this.loading = false;
@@ -48,6 +50,11 @@ export class UsersComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.fetchUsers();
   }
 
   toggleCreateForm(): void {

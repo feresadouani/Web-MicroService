@@ -2,10 +2,13 @@ package com.example.user.Security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -26,8 +29,18 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        /* Profil du token JWT : user ou admin */
+                        .requestMatchers(HttpMethod.PATCH, "/users/me")
+                                .hasAnyRole("CLIENT_USER", "CLIENT_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users/me").authenticated()
+                        .requestMatchers("/users/test", "/users/test2").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/users", "/users/").hasRole("CLIENT_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/users", "/users/").hasRole("CLIENT_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/users/**").hasRole("CLIENT_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/users/**").hasRole("CLIENT_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("CLIENT_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users/**").hasRole("CLIENT_ADMIN")
                         .requestMatchers("/users/admin/**").hasRole("CLIENT_ADMIN")
-                        .requestMatchers("/users/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth -> oauth
@@ -35,6 +48,11 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
