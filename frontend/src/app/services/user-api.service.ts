@@ -3,14 +3,12 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-/** Réponse HAL Spring Data REST pour une collection */
 interface HalUsersResponse {
   _embedded?: {
     users?: HalUserItem[];
   };
 }
 
-/** Représentation HAL d’un user (id + éventuellement lien self) */
 type HalUserItem = UserDto & {
   _links?: { self?: { href?: string } };
 };
@@ -38,7 +36,6 @@ export interface UpdateUserPayload {
   lastname: string;
   email: string;
   role: 'USER' | 'ADMIN';
-  /** Si renseigné, le mot de passe est mis à jour (JSON Merge Patch). */
   password?: string;
 }
 
@@ -73,9 +70,6 @@ export class UserApiService {
     return this.http.get(`${this.gatewayBaseUrl}/users/me`);
   }
 
-  /**
-   * Liste des utilisateurs (HAL). Avec {@code search}, appelle l’API de recherche admin (JSON tableau).
-   */
   getUsers(search?: string | null): Observable<UserDto[]> {
     const q = search?.trim();
     if (q) {
@@ -98,9 +92,6 @@ export class UserApiService {
     return this.http.post<UserDto>(`${this.gatewayBaseUrl}/users`, body);
   }
 
-  /**
-   * Mise à jour partielle via Spring Data REST (PATCH + merge-patch+json).
-   */
   updateUser(id: number, payload: UpdateUserPayload): Observable<UserDto> {
     const body: Record<string, string> = {
       firstname: payload.firstname,
