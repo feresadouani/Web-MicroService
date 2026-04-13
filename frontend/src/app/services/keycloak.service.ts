@@ -5,7 +5,7 @@ class KeycloakService {
 
   init(): Promise<boolean> {
     this._keycloak = new Keycloak({
-      url: 'http://localhost:8080',
+      url: 'http://localhost:9090',
       realm: 'spring',
       clientId: 'frontend'
     });

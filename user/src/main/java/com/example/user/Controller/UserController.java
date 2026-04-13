@@ -3,7 +3,7 @@ package com.example.user.Controller;
 import com.example.user.Entity.User;
 import com.example.user.Repository.UserRepository;
 import com.example.user.dto.ProfilePatchDto;
-import com.example.user.service.LocalUserFromJwtService;
+import com.example.user.Service.LocalUserFromJwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
