@@ -3,7 +3,7 @@ package com.example.user.Controller;
 import com.example.user.Entity.User;
 import com.example.user.Repository.UserRepository;
 import com.example.user.dto.ProfilePatchDto;
-import com.example.user.service.LocalUserFromJwtService;
+import com.example.user.Service.LocalUserFromJwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,11 +37,6 @@ public class UserController {
         this.localUserFromJwtService = localUserFromJwtService;
     }
 
-
-    /**
-     * Recherche d’utilisateurs (prénom, nom, email) réservée aux admins.
-     * Si {@code q} est vide ou absent, renvoie toute la liste (même comportement que la collection REST).
-     */
     @GetMapping("/admin/search")
     public List<User> adminSearchUsers(@RequestParam(name = "q", required = false) String q) {
         if (q == null || q.isBlank()) {
@@ -65,18 +60,14 @@ public class UserController {
             try {
                 User local = localUserFromJwtService.ensureLocalUserFromJwt(jwt);
                 response.put("dbUserId", local.getId());
-            } catch (IllegalArgumentException ex) {
-                response.put("dbSyncError", ex.getMessage());
+            } catch (IllegalArgumentException ignored) {
+                response.put("dbSyncError", "An error occurred while synchronizing your account.");
             }
         }
 
         return response;
     }
 
-    /**
-     * Mise à jour du profil de l’utilisateur connecté uniquement (email issu du JWT).
-     * Les écritures sur la collection /users (Data REST) restent réservées au client_admin.
-     */
     @PatchMapping("/me")
     public User patchMyProfile(Authentication authentication, @RequestBody ProfilePatchDto body) {
         if (authentication == null || !(authentication.getPrincipal() instanceof Jwt jwt)) {
@@ -85,8 +76,8 @@ public class UserController {
         User user;
         try {
             user = localUserFromJwtService.ensureLocalUserFromJwt(jwt);
-        } catch (IllegalArgumentException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (IllegalArgumentException ignored) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An error occurred while updating your profile.");
         }
 
         if (body.getFirstname() != null) {

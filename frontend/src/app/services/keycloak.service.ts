@@ -53,9 +53,6 @@ class KeycloakService {
     return this._keycloak.tokenParsed;
   }
 
-  /**
-   * Rôles realm + clients Keycloak (comme sur la gateway : realm_access + resource_access).
-   */
   getRoleNames(): string[] {
     const parsed = this._keycloak?.tokenParsed as Record<string, unknown> | undefined;
     if (!parsed) {
@@ -73,24 +70,16 @@ class KeycloakService {
     return [...names];
   }
 
-  /** Rôle client Keycloak « admin » (une seule convention : {@code client_admin}). */
   private static readonly KEYCLOAK_ADMIN = 'CLIENT_ADMIN';
 
-  /** Rôle client Keycloak « utilisateur » ({@code client_user}). */
   private static readonly KEYCLOAK_USER = 'CLIENT_USER';
 
-  /**
-   * Accès back-office : uniquement le rôle client {@code client_admin}.
-   */
   isAdmin(): boolean {
     return this.getRoleNames().some(
       (r) => this.normalizeRoleKey(r) === KeycloakService.KEYCLOAK_ADMIN
     );
   }
 
-  /**
-   * Utilisateur standard côté Keycloak : {@code client_user}.
-   */
   isClientUser(): boolean {
     return this.getRoleNames().some(
       (r) => this.normalizeRoleKey(r) === KeycloakService.KEYCLOAK_USER

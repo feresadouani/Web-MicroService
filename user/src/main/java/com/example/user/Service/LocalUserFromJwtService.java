@@ -1,4 +1,4 @@
-package com.example.user.service;
+package com.example.user.Service;
 
 import com.example.user.Entity.User;
 import com.example.user.Repository.UserRepository;
@@ -9,9 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-/**
- * Après inscription Keycloak : première requête authentifiée crée la ligne en base locale.
- */
+
 @Service
 @RequiredArgsConstructor
 public class LocalUserFromJwtService {
@@ -25,7 +23,7 @@ public class LocalUserFromJwtService {
             email = jwt.getClaimAsString("preferred_username");
         }
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Jeton sans email ni preferred_username : impossible de provisionner la base.");
+            throw new IllegalArgumentException("An error occurred while loading your account.");
         }
         String key = email.trim();
         return userRepository.findByEmail(key).orElseGet(() -> {

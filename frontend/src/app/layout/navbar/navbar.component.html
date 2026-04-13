@@ -7,7 +7,13 @@
 
   <div class="right">
     <button class="account-button" type="button" (click)="toggleAccountDropdown($event)">
-      <span class="avatar">⌁</span>
+      <img
+        class="avatar"
+        src="assets/img/default_user_icon.png"
+        width="24"
+        height="24"
+        [attr.alt]="'Account: ' + userName"
+      />
       <span class="account-text">{{ userName }}</span>
       <span class="caret">▾</span>
     </button>
@@ -15,7 +21,7 @@
     <div class="dropdown" *ngIf="accountDropdownOpen">
       <div class="dropdown-user">
         <strong>{{ userName }}</strong>
-        <small>{{ userEmail }}</small>
+        <small *ngIf="userEmail">{{ userEmail }}</small>
       </div>
       <button type="button" class="dropdown-item">Billing</button>
       <button type="button" class="dropdown-item danger" (click)="logout()">Logout</button>

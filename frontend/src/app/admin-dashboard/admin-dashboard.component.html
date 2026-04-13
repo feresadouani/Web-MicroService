@@ -9,48 +9,49 @@
       <h1>Dashboard</h1>
     </section>
 
-    <article class="card user-search-card">
-      <h3>Recherche utilisateur</h3>
-      <p class="muted">Filtre côté serveur sur le prénom, le nom ou l’email.</p>
-      <form class="search-row" (submit)="$event.preventDefault(); searchUsers();">
-        <input
-          [(ngModel)]="userSearchQuery"
-          name="dash-user-search"
-          type="search"
-          placeholder="Prénom, nom ou email…"
-          autocomplete="off"
-        />
-        <button type="submit" class="primary-btn">Rechercher</button>
-        <button type="button" class="ghost-btn" (click)="clearUserSearch()">Effacer</button>
-      </form>
-      <p class="error" *ngIf="userSearchError">{{ userSearchError }}</p>
-      <p *ngIf="userSearchLoading">Chargement…</p>
-      <ul class="mini-user-list" *ngIf="!userSearchLoading && userSearchResults.length">
-        <li *ngFor="let u of userSearchResults | slice : 0 : 8">
-          <span class="mini-name">{{ u.firstname }} {{ u.lastname }}</span>
-          <span class="mini-email">{{ u.email }}</span>
-          <span class="mini-role">{{ u.role || 'USER' }}</span>
-        </li>
-      </ul>
-      <p class="muted more-link" *ngIf="!userSearchLoading && userSearchResults.length > 8">
-        <a routerLink="/admin/users">Ouvrir la page Users pour la liste complète →</a>
-      </p>
-      <p
-        class="muted"
-        *ngIf="userSearchAttempted && !userSearchLoading && !userSearchError && userSearchResults.length === 0"
-      >
-        Aucun utilisateur ne correspond à cette recherche.
-      </p>
-    </article>
-
     <div class="kpi-grid">
-      <article class="card" *ngFor="let kpi of kpis">
-        <div class="kpi-head">
-          <p class="card-title">{{ kpi.title }}</p>
-          <span class="kpi-icon">{{ kpi.icon }}</span>
+      <article class="stat-card">
+        <div class="stat-head">
+          <p class="stat-title">Registered users</p>
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </span>
         </div>
-        <h3>{{ kpi.value }}</h3>
-        <small class="trend positive">{{ kpi.trend }}</small>
+        <p class="stat-value" *ngIf="userMiniStatLoading">…</p>
+        <p class="stat-value" *ngIf="!userMiniStatLoading && userMiniStatCount !== null">{{ userMiniStatCount }}</p>
+        <p class="stat-value stat-value--muted" *ngIf="userMiniStatError">—</p>
+        <p class="stat-trend" *ngIf="!userMiniStatLoading && !userMiniStatError">
+          <a routerLink="/admin/users" class="stat-trend-link">Manage users →</a>
+        </p>
+        <p class="stat-trend" *ngIf="userMiniStatError">Unable to load count</p>
+      </article>
+
+      <article class="stat-card" *ngFor="let kpi of kpis">
+        <div class="stat-head">
+          <p class="stat-title">{{ kpi.title }}</p>
+          <span class="stat-icon" aria-hidden="true">
+            <svg *ngIf="kpi.icon === 'building'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18" />
+              <path d="M5 21V7l8-4v18" />
+              <path d="M19 21V11l-6-4" />
+            </svg>
+            <svg *ngIf="kpi.icon === 'chart'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18" />
+              <path d="m7 16 4-4 4 4 6-7" />
+            </svg>
+            <svg *ngIf="kpi.icon === 'money'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v12M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </span>
+        </div>
+        <p class="stat-value">{{ kpi.value }}</p>
+        <p class="stat-trend">{{ kpi.trend }}</p>
       </article>
     </div>
 

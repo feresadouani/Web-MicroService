@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 import { SidebarItem } from '../layout/sidebar/sidebar.component';
 import { UserApiService, CreateUserPayload, UserDto } from '../services/user-api.service';
 
@@ -7,7 +9,7 @@ import { UserApiService, CreateUserPayload, UserDto } from '../services/user-api
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
-export class UsersComponent implements OnInit {
+export class UsersComponent implements OnInit, OnDestroy {
   menuItems: SidebarItem[] = [
     { label: 'Dashboard', route: ['/admin', 'dashboard'] },
     { label: 'Users', route: ['/admin', 'users'] },
@@ -17,7 +19,6 @@ export class UsersComponent implements OnInit {
   loading = false;
   showCreateForm = false;
   error = '';
-  /** Filtre de recherche (prénom, nom, email) envoyé au backend */
   searchQuery = '';
 
   newUser: CreateUserPayload = {
@@ -28,13 +29,46 @@ export class UsersComponent implements OnInit {
     role: 'USER'
   };
 
-  /** Formulaire d’édition (PATCH merge-patch sur /users/{id}) */
   editingUser: UserDto | null = null;
+
+  private readonly searchInput$ = new Subject<string>();
+  private readonly destroy$ = new Subject<void>();
 
   constructor(private readonly userApiService: UserApiService) {}
 
   ngOnInit(): void {
-    this.fetchUsers();
+    this.loading = true;
+    this.searchInput$
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        switchMap((q) => {
+          this.loading = true;
+          this.error = '';
+          return this.userApiService.getUsers(q);
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (users) => {
+          this.users = users;
+          this.loading = false;
+        },
+        error: () => {
+          this.error = 'An error occurred while fetching users.';
+          this.loading = false;
+        }
+      });
+    this.searchInput$.next(this.searchQuery);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  onSearchQueryChange(): void {
+    this.searchInput$.next(this.searchQuery);
   }
 
   fetchUsers(): void {
@@ -45,8 +79,8 @@ export class UsersComponent implements OnInit {
         this.users = users;
         this.loading = false;
       },
-      error: (err) => {
-        this.error = `Erreur chargement users: ${err.status} ${err.statusText}`;
+      error: () => {
+        this.error = 'An error occurred while fetching users.';
         this.loading = false;
       }
     });
@@ -75,8 +109,8 @@ export class UsersComponent implements OnInit {
         };
         this.fetchUsers();
       },
-      error: (err) => {
-        this.error = `Erreur création user: ${err.status} ${err.statusText}`;
+      error: () => {
+        this.error = 'An error occurred while creating the user.';
       }
     });
   }
@@ -84,7 +118,7 @@ export class UsersComponent implements OnInit {
   startEdit(user: UserDto): void {
     this.error = '';
     if (user.id == null) {
-      this.error = 'Impossible de modifier : identifiant manquant.';
+      this.error = 'An error occurred while editing the user.';
       return;
     }
     this.showCreateForm = false;
@@ -119,20 +153,20 @@ export class UsersComponent implements OnInit {
           this.editingUser = null;
           this.fetchUsers();
         },
-        error: (err) => {
-          this.error = `Erreur mise à jour user: ${err.status} ${err.statusText}`;
+        error: () => {
+          this.error = 'An error occurred while updating the user.';
         }
       });
   }
 
   deleteUser(user: UserDto): void {
     if (user.id == null) {
-      this.error = 'Impossible de supprimer : identifiant manquant.';
+      this.error = 'An error occurred while deleting the user.';
       return;
     }
     if (
       !confirm(
-        `Supprimer l’utilisateur ${user.firstname} ${user.lastname} (${user.email}) ?`
+        `Delete user ${user.firstname} ${user.lastname} (${user.email})?`
       )
     ) {
       return;
@@ -145,8 +179,8 @@ export class UsersComponent implements OnInit {
         }
         this.fetchUsers();
       },
-      error: (err) => {
-        this.error = `Erreur suppression user: ${err.status} ${err.statusText}`;
+      error: () => {
+        this.error = 'An error occurred while deleting the user.';
       }
     });
   }

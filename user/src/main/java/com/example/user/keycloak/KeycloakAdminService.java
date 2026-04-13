@@ -23,9 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Création d’utilisateurs Keycloak après ajout en base, et détection des comptes déjà présents (inscription KC).
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -34,8 +32,7 @@ public class KeycloakAdminService {
     private final KeycloakAdminProperties props;
     private final ObjectMapper objectMapper;
 
-    /** Mot de passe en clair mémorisé dans {@code onBeforeCreate} (perdu ou hashé sur l’entité après persist). */
-    private final ConcurrentHashMap<String, String> plainPasswordByEmail = new ConcurrentHashMap<>();
+   private final ConcurrentHashMap<String, String> plainPasswordByEmail = new ConcurrentHashMap<>();
 
     public void stashPlainPasswordForNewUser(String email, String rawPassword) {
         if (email == null || email.isBlank() || rawPassword == null || rawPassword.isBlank()) {
@@ -50,10 +47,7 @@ public class KeycloakAdminService {
         }
     }
 
-    /**
-     * Appelé après {@code save} sur {@link User} (ex. POST Data REST).
-     * Si l’email existe déjà dans Keycloak (ex. utilisateur venant de s’inscrire), on n’essaie pas de recréer.
-     */
+
     public void syncUserToKeycloakAfterPersist(User user) {
         if (!props.isEnabled()) {
             log.debug("Keycloak : synchronisation désactivée (keycloak.admin.enabled=false).");
@@ -217,7 +211,6 @@ public class KeycloakAdminService {
             throw e;
         }
 
-        // Localiser l’ID : recherche exacte après création
         String listJson = client().get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/admin/realms/{realm}/users")
