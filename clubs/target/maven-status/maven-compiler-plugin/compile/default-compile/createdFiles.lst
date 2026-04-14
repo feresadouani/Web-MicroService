@@ -1,0 +1,6 @@
+com\example\clubs\ClubsApplication.class
+com\example\clubs\entity\Club.class
+com\example\clubs\config\SecurityConfig.class
+com\example\clubs\service\ClubService.class
+com\example\clubs\repository\ClubRepository.class
+com\example\clubs\controller\ClubController.class
