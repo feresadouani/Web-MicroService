@@ -41,6 +41,8 @@ public class SecurityConfig {
                 .authorizeExchange(exchange -> exchange
                         /* Preflight CORS: pas de JWT sur OPTIONS — sinon 401 sans en-têtes CORS */
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        /* Santé du microservice reclamation (routé par la gateway) — sans JWT pour Postman / probes */
+                        .pathMatchers(HttpMethod.GET, "/health").permitAll()
                         .pathMatchers("/public/**").permitAll()
                         /* Keycloak : rôle client client_admin → ROLE_CLIENT_ADMIN */
                         .pathMatchers("/admin/**").hasRole("CLIENT_ADMIN")

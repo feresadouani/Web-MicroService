@@ -10,6 +10,7 @@ import { UserApiService, CreateUserPayload, UserDto } from '../services/user-api
   styleUrl: './users.component.css'
 })
 export class UsersComponent implements OnInit, OnDestroy {
+  private static readonly STRONG_PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).+$/;
   menuItems: SidebarItem[] = [
     { label: 'Dashboard', route: ['/admin', 'dashboard'] },
     { label: 'Users', route: ['/admin', 'users'] },
@@ -20,13 +21,16 @@ export class UsersComponent implements OnInit, OnDestroy {
   showCreateForm = false;
   error = '';
   searchQuery = '';
+  createPasswordError = '';
+  editPasswordError = '';
 
   newUser: CreateUserPayload = {
     firstname: '',
     lastname: '',
     email: '',
     password: '',
-    role: 'USER'
+    role: 'USER',
+    birthday: ''
   };
 
   editingUser: UserDto | null = null;
@@ -97,6 +101,11 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   createUser(): void {
     this.error = '';
+    this.createPasswordError = '';
+    if (!this.isStrongPassword(this.newUser.password)) {
+      this.createPasswordError = 'Password must contain letters, numbers and special characters.';
+      return;
+    }
     this.userApiService.createUser(this.newUser).subscribe({
       next: () => {
         this.showCreateForm = false;
@@ -105,7 +114,8 @@ export class UsersComponent implements OnInit, OnDestroy {
           lastname: '',
           email: '',
           password: '',
-          role: 'USER'
+          role: 'USER',
+          birthday: ''
         };
         this.fetchUsers();
       },
@@ -117,6 +127,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   startEdit(user: UserDto): void {
     this.error = '';
+    this.editPasswordError = '';
     if (user.id == null) {
       this.error = 'An error occurred while editing the user.';
       return;
@@ -131,6 +142,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   cancelEdit(): void {
     this.editingUser = null;
+    this.editPasswordError = '';
   }
 
   saveEdit(): void {
@@ -140,13 +152,19 @@ export class UsersComponent implements OnInit, OnDestroy {
     }
     const id = u.id;
     this.error = '';
+    this.editPasswordError = '';
+    const trimmedPassword = u.password?.trim() ?? '';
+    if (trimmedPassword && !this.isStrongPassword(trimmedPassword)) {
+      this.editPasswordError = 'New password must contain letters, numbers and special characters.';
+      return;
+    }
     this.userApiService
       .updateUser(id, {
         firstname: u.firstname,
         lastname: u.lastname,
         email: u.email,
         role: (u.role === 'ADMIN' ? 'ADMIN' : 'USER') as 'USER' | 'ADMIN',
-        password: u.password?.trim() ? u.password : undefined
+        password: trimmedPassword ? trimmedPassword : undefined
       })
       .subscribe({
         next: () => {
@@ -157,6 +175,18 @@ export class UsersComponent implements OnInit, OnDestroy {
           this.error = 'An error occurred while updating the user.';
         }
       });
+  }
+
+  onCreatePasswordChange(): void {
+    this.createPasswordError = '';
+  }
+
+  onEditPasswordChange(): void {
+    this.editPasswordError = '';
+  }
+
+  private isStrongPassword(password: string): boolean {
+    return UsersComponent.STRONG_PASSWORD_REGEX.test(password);
   }
 
   deleteUser(user: UserDto): void {
