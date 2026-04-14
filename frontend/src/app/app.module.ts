@@ -13,12 +13,14 @@ import { FooterComponent } from './layout/footer/footer.component';
 import { UsersComponent } from './users/users.component';
 import { PostLoginRedirectComponent } from './post-login-redirect/post-login-redirect.component';
 import { UserPortalComponent } from './user-portal/user-portal.component';
+import { CoursComponent } from './cours/cours.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AdminDashboardComponent,
     UsersComponent,
+    CoursComponent,
     PostLoginRedirectComponent,
     UserPortalComponent,
     SidebarComponent,

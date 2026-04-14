@@ -1,0 +1,94 @@
+<div class="cours-layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems">
+  </app-sidebar>
+
+  <section class="cours-content">
+    <app-navbar></app-navbar>
+
+    <section class="header-row">
+      <div>
+        <h1>Cours</h1>
+      </div>
+      <button type="button" class="primary-btn" (click)="toggleCreateForm()">
+        {{ showCreateForm ? 'Fermer le formulaire' : 'Ajouter un cours' }}
+      </button>
+    </section>
+
+    <article class="card" *ngIf="showCreateForm">
+      <h3>Nouveau cours</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); createCours();">
+        <input [(ngModel)]="newCours.title" name="title" placeholder="Titre" required />
+        <input [(ngModel)]="newCours.author" name="author" placeholder="Auteur" required />
+        <input [(ngModel)]="newCours.category" name="category" placeholder="Categorie" required />
+        <textarea
+          [(ngModel)]="newCours.content"
+          name="content"
+          placeholder="Contenu du cours"
+          rows="4"
+          required
+        ></textarea>
+        <button type="submit" class="primary-btn">Enregistrer</button>
+      </form>
+    </article>
+
+    <article class="card" *ngIf="editingCoursId !== null">
+      <h3>Modifier le cours</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); saveEdit();">
+        <input [(ngModel)]="editCours.title" name="edit-title" placeholder="Titre" required />
+        <input [(ngModel)]="editCours.author" name="edit-author" placeholder="Auteur" required />
+        <input [(ngModel)]="editCours.category" name="edit-category" placeholder="Categorie" required />
+        <textarea
+          [(ngModel)]="editCours.content"
+          name="edit-content"
+          placeholder="Contenu du cours"
+          rows="4"
+          required
+        ></textarea>
+        <div class="form-actions-inline">
+          <button type="submit" class="primary-btn">Enregistrer</button>
+          <button type="button" class="ghost-btn" (click)="cancelEdit()">Annuler</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="card">
+      <div class="table-header">
+        <h3>Liste des cours</h3>
+        <button type="button" class="ghost-btn" (click)="fetchCours()">Rafraichir</button>
+      </div>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p *ngIf="loading">Chargement...</p>
+
+      <table *ngIf="!loading">
+        <thead>
+          <tr>
+            <th>Titre</th>
+            <th>Auteur</th>
+            <th>Categorie</th>
+            <th>Date de publication</th>
+            <th>Contenu</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cours of coursList">
+            <td>{{ cours.title }}</td>
+            <td>{{ cours.author }}</td>
+            <td>{{ cours.category }}</td>
+            <td>{{ cours.dateOfPost ? (cours.dateOfPost | date : 'short') : '-' }}</td>
+            <td>{{ cours.content }}</td>
+            <td class="col-actions">
+              <div class="row-actions">
+                <button type="button" class="ghost-btn btn-sm" (click)="startEdit(cours)">Modifier</button>
+                <button type="button" class="danger-btn btn-sm" (click)="deleteCours(cours)">Supprimer</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+
+    <app-footer [text]="'© 2026 Cours Administration'"></app-footer>
+  </section>
+</div>

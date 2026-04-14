@@ -1,0 +1,153 @@
+.cours-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 12px;
+  padding: 10px;
+}
+
+.cours-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-row h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.create-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.create-form input,
+.create-form textarea {
+  border: 1px solid #dbe2ea;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font: inherit;
+}
+
+.create-form textarea {
+  grid-column: 1 / -1;
+  resize: vertical;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid #eef2f7;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+th {
+  color: #64748b;
+  font-weight: 600;
+}
+
+td:nth-child(5) {
+  max-width: 380px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.primary-btn,
+.ghost-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.primary-btn {
+  background: #16a34a;
+  color: #fff;
+}
+
+.ghost-btn {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.col-actions {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-sm {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.danger-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.danger-btn:hover {
+  background: #fee2e2;
+}
+
+.form-actions-inline {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+@media (max-width: 1000px) {
+  .cours-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .create-form {
+    grid-template-columns: 1fr;
+  }
+}

@@ -5,7 +5,6 @@ import com.example.cours.repository.CoursRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,9 +22,6 @@ public class CoursService {
     }
 
     public Cours addCours(Cours cours) {
-        if (cours.getDateOfPost() == null) {
-            cours.setDateOfPost(LocalDateTime.now());
-        }
         return coursRepository.save(cours);
     }
 
@@ -36,7 +32,6 @@ public class CoursService {
             currentCours.setContent(cours.getContent());
             currentCours.setAuthor(cours.getAuthor());
             currentCours.setCategory(cours.getCategory());
-            currentCours.setDateOfPost(cours.getDateOfPost());
             return coursRepository.save(currentCours);
         }
         return null;

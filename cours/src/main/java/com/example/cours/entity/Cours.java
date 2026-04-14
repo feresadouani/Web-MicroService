@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,4 +27,16 @@ public class Cours {
     private LocalDateTime dateOfPost;
     private String author;
     private String category;
+
+    @PrePersist
+    void onCreate() {
+        dateOfPost = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        if (dateOfPost == null) {
+            dateOfPost = LocalDateTime.now();
+        }
+    }
 }
