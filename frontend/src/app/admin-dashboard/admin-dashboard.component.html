@@ -1,0 +1,98 @@
+<div class="dashboard-layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems">
+  </app-sidebar>
+
+  <section class="dashboard-content">
+    <app-navbar></app-navbar>
+
+    <section class="page-header">
+      <h1>Dashboard</h1>
+    </section>
+
+    <div class="kpi-grid">
+      <article class="stat-card">
+        <div class="stat-head">
+          <p class="stat-title">Registered users</p>
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </span>
+        </div>
+        <p class="stat-value" *ngIf="userMiniStatLoading">…</p>
+        <p class="stat-value" *ngIf="!userMiniStatLoading && userMiniStatCount !== null">{{ userMiniStatCount }}</p>
+        <p class="stat-value stat-value--muted" *ngIf="userMiniStatError">—</p>
+        <p class="stat-trend" *ngIf="!userMiniStatLoading && !userMiniStatError">
+          <a routerLink="/admin/users" class="stat-trend-link">Manage users →</a>
+        </p>
+        <p class="stat-trend" *ngIf="userMiniStatError">Unable to load count</p>
+      </article>
+
+      <article class="stat-card" *ngFor="let kpi of kpis">
+        <div class="stat-head">
+          <p class="stat-title">{{ kpi.title }}</p>
+          <span class="stat-icon" aria-hidden="true">
+            <svg *ngIf="kpi.icon === 'building'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18" />
+              <path d="M5 21V7l8-4v18" />
+              <path d="M19 21V11l-6-4" />
+            </svg>
+            <svg *ngIf="kpi.icon === 'chart'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18" />
+              <path d="m7 16 4-4 4 4 6-7" />
+            </svg>
+            <svg *ngIf="kpi.icon === 'money'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v12M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </span>
+        </div>
+        <p class="stat-value">{{ kpi.value }}</p>
+        <p class="stat-trend">{{ kpi.trend }}</p>
+      </article>
+    </div>
+
+    <article class="card chart-card">
+      <h3>Revenue Trend</h3>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 900 230" preserveAspectRatio="none">
+          <polyline points="0,160 120,150 240,155 360,145 480,110 600,120 720,112 900,95" fill="none" stroke="#34d399"
+            stroke-width="3" />
+          <polyline points="0,230 0,160 120,150 240,155 360,145 480,110 600,120 720,112 900,95 900,230"
+            fill="rgba(52,211,153,0.12)" stroke="none" />
+        </svg>
+      </div>
+    </article>
+
+    <div class="content-grid">
+      <article class="card">
+        <h3>Recent Activity</h3>
+        <div class="list">
+          <div class="list-item" *ngFor="let activity of activities">
+            <strong>{{ activity.title }}</strong>
+            <p>{{ activity.description }}</p>
+            <small>{{ activity.time }}</small>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Upcoming Tasks</h3>
+        <div class="list">
+          <label class="task-item" *ngFor="let task of tasks">
+            <input type="checkbox" />
+            <span>
+              <strong>{{ task.title }}</strong>
+              <small>{{ task.date }}</small>
+            </span>
+          </label>
+        </div>
+      </article>
+    </div>
+
+    <app-footer [text]="'© 2026, The Compilers'"></app-footer>
+  </section>
+</div>

@@ -1,0 +1,31 @@
+<header class="topbar">
+  <div class="left">
+    <form class="search" (submit)="$event.preventDefault()">
+      <input type="search" [(ngModel)]="searchQuery" name="searchQuery" placeholder="Search..." />
+    </form>
+  </div>
+
+  <div class="right">
+    <a *ngIf="!isAdmin" routerLink="/reclamations/add" class="action-link primary">Add reclamation</a>
+    <a *ngIf="!isAdmin" routerLink="/reclamations" class="action-link">Mes réclamations</a>
+    <button class="account-button" type="button" (click)="toggleAccountDropdown($event)">
+      <img
+        class="avatar"
+        src="assets/img/default_user_icon.png"
+        width="24"
+        height="24"
+        [attr.alt]="'Account: ' + userName"
+      />
+      <span class="account-text">{{ userName }}</span>
+      <span class="caret">▾</span>
+    </button>
+
+    <div class="dropdown" *ngIf="accountDropdownOpen">
+      <div class="dropdown-user">
+        <strong>{{ userName }}</strong>
+        <small *ngIf="userEmail">{{ userEmail }}</small>
+      </div>
+      <button type="button" class="dropdown-item danger" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</header>

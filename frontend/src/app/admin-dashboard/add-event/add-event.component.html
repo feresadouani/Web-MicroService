@@ -1,0 +1,57 @@
+<div class="dashboard-layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems"></app-sidebar>
+
+  <section class="dashboard-content">
+    <app-navbar></app-navbar>
+
+    <section class="header-row">
+      <h1>Add New Event</h1>
+      <div class="header-actions">
+        <button type="button" class="ghost-btn" (click)="resetForm()" [disabled]="isLoading">Cancel</button>
+        <button type="button" class="primary-btn" (click)="onSubmit()" [disabled]="isLoading || eventForm.invalid">
+          {{ isLoading ? 'Processing...' : 'Add event' }}
+        </button>
+      </div>
+    </section>
+
+    <article class="card">
+      <p class="alert alert-success" *ngIf="showSuccessAlert">{{ successMessage }}</p>
+      <p class="alert alert-error" *ngIf="showErrorAlert">{{ errorMessage }}</p>
+
+      <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="form">
+        <div class="grid">
+          <mat-form-field class="full-width">
+            <mat-label>Event Name</mat-label>
+            <input matInput placeholder="Enter event name" formControlName="name" />
+            <mat-error *ngIf="name?.hasError('required')">Event name is required</mat-error>
+            <mat-error *ngIf="name?.hasError('minlength')">At least 3 characters</mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="full-width">
+            <mat-label>Location</mat-label>
+            <input matInput placeholder="Enter event location" formControlName="location" />
+            <mat-error *ngIf="location?.hasError('required')">Location is required</mat-error>
+            <mat-error *ngIf="location?.hasError('minlength')">At least 3 characters</mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput placeholder="Enter event description" formControlName="description" rows="4"></textarea>
+          <mat-error *ngIf="description?.hasError('required')">Description is required</mat-error>
+          <mat-error *ngIf="description?.hasError('minlength')">At least 10 characters</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-label>Event Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="date" />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="date?.hasError('required')">Event date is required</mat-error>
+        </mat-form-field>
+      </form>
+    </article>
+
+    <app-footer [text]="'© 2026 Events Administration'"></app-footer>
+  </section>
+</div>

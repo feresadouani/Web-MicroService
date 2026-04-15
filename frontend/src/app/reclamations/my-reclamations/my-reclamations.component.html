@@ -1,0 +1,60 @@
+<div class="transit-page">
+  <app-user-navbar [active]="'reclamations'"></app-user-navbar>
+  <section class="page">
+
+  <section class="header-row">
+    <h1>Mes réclamations</h1>
+    <div class="header-actions">
+      <a class="primary" routerLink="/reclamations/add">Ajouter</a>
+      <button type="button" class="ghost" (click)="refresh()">Refresh</button>
+    </div>
+  </section>
+
+  <article class="card">
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <p *ngIf="loading">Loading...</p>
+
+    <table *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Statut</th>
+          <th>Réponse admin</th>
+          <th style="width: 120px;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="!error && rows.length === 0">
+          <td colspan="4" class="empty">Aucune réclamation.</td>
+        </tr>
+        <tr *ngFor="let r of rows">
+          <td>
+            <strong>{{ r.title }}</strong>
+            <div class="desc">{{ r.description }}</div>
+          </td>
+          <td>
+            <span class="status" [attr.data-status]="r.status">{{ r.status }}</span>
+          </td>
+          <td>
+            <div class="reply" *ngIf="r.reply; else noReply">
+              {{ r.reply }}
+              <div class="reply-date" *ngIf="r.repliedAt">
+                {{ r.repliedAt | date:'medium' }}
+              </div>
+            </div>
+            <ng-template #noReply>
+              <span class="muted">—</span>
+            </ng-template>
+          </td>
+          <td>
+            <a class="link" [routerLink]="['/reclamations', r.id, 'edit']">Modifier</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
+
+    <app-footer [text]="'© 2026 Reclamations'"></app-footer>
+  </section>
+</div>
+

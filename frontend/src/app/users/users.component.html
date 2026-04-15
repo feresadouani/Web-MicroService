@@ -1,0 +1,125 @@
+<div class="users-layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems">
+  </app-sidebar>
+
+  <section class="users-content">
+    <app-navbar></app-navbar>
+
+    <section class="header-row">
+      <div>
+        <h1>Users</h1>
+      </div>
+      <button type="button" class="primary-btn" (click)="toggleCreateForm()">
+        {{ showCreateForm ? 'Close form' : 'Add user' }}
+      </button>
+    </section>
+
+    <article class="card" *ngIf="editingUser">
+      <h3>Edit user</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); saveEdit();">
+        <input [(ngModel)]="editingUser.firstname" name="edit-firstname" placeholder="Firstname" required />
+        <input [(ngModel)]="editingUser.lastname" name="edit-lastname" placeholder="Lastname" required />
+        <input [(ngModel)]="editingUser.email" name="edit-email" type="email" placeholder="Email" required />
+        <div class="field-stack">
+          <input
+            [(ngModel)]="editingUser.password"
+            (ngModelChange)="onEditPasswordChange()"
+            name="edit-password"
+            type="password"
+            placeholder="New password (optional)"
+            pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).+$"
+            title="Use letters, numbers and special characters."
+          />
+          <p class="field-error" *ngIf="editPasswordError">{{ editPasswordError }}</p>
+        </div>
+        <select [(ngModel)]="editingUser.role" name="edit-role">
+          <option value="USER">USER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+        <div class="form-actions-inline">
+          <button type="submit" class="primary-btn">Save</button>
+          <button type="button" class="ghost-btn" (click)="cancelEdit()">Cancel</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="card" *ngIf="showCreateForm">
+      <h3>New user</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); createUser();">
+        <input [(ngModel)]="newUser.firstname" name="firstname" placeholder="Firstname" required />
+        <input [(ngModel)]="newUser.lastname" name="lastname" placeholder="Lastname" required />
+        <input [(ngModel)]="newUser.email" name="email" type="email" placeholder="Email" required />
+        <input [(ngModel)]="newUser.birthday" name="birthday" type="date" placeholder="Birthday" />
+        <div class="field-stack">
+          <input
+            [(ngModel)]="newUser.password"
+            (ngModelChange)="onCreatePasswordChange()"
+            name="password"
+            type="password"
+            placeholder="Password"
+            required
+            pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).+$"
+            title="Use letters, numbers and special characters."
+          />
+          <p class="field-error" *ngIf="createPasswordError">{{ createPasswordError }}</p>
+        </div>
+        <select [(ngModel)]="newUser.role" name="role">
+          <option value="USER">USER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+        <button type="submit" class="primary-btn">Create</button>
+      </form>
+    </article>
+
+    <article class="card">
+      <div class="table-header">
+        <h3>User list</h3>
+        <button type="button" class="ghost-btn" (click)="fetchUsers()">Refresh</button>
+      </div>
+
+      <form class="search-row" (submit)="$event.preventDefault(); fetchUsers();">
+        <input
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchQueryChange()"
+          name="user-search"
+          type="search"
+          placeholder="Search (first name, last name, email)…"
+          autocomplete="off"
+        />
+        <button type="submit" class="primary-btn">Search</button>
+        <button type="button" class="ghost-btn" (click)="clearSearch()">Reset</button>
+      </form>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p *ngIf="loading">Loading…</p>
+
+      <table *ngIf="!loading">
+        <thead>
+          <tr>
+            <th>Firstname</th>
+            <th>Lastname</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.firstname }}</td>
+            <td>{{ user.lastname }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role || 'USER' }}</td>
+            <td class="col-actions">
+              <div class="row-actions">
+                <button type="button" class="ghost-btn btn-sm" (click)="startEdit(user)">Edit</button>
+                <button type="button" class="danger-btn btn-sm" (click)="deleteUser(user)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+
+    <app-footer [text]="'© 2026 Users Administration'"></app-footer>
+  </section>
+</div>

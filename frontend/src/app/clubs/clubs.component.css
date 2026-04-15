@@ -1,0 +1,188 @@
+.clubs-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 12px;
+  padding: 10px;
+}
+
+.clubs-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-row h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.create-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+  align-items: start;
+}
+
+.create-form input {
+  border: 1px solid #dbe2ea;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font: inherit;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid #eef2f7;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+th {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.col-description {
+  max-width: 440px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.primary-btn,
+.ghost-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.primary-btn {
+  background: #16a34a;
+  color: #fff;
+}
+
+.ghost-btn {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.danger-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.danger-btn:hover {
+  background: #fee2e2;
+}
+
+.btn-sm {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.col-actions {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.form-actions-inline {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.inline-edit {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.inline-edit input {
+  min-width: 160px;
+  border: 1px solid #dbe2ea;
+  border-radius: 8px;
+  padding: 7px 9px;
+}
+
+.member-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.member-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.muted {
+  color: #64748b;
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+.muted-inline {
+  color: #64748b;
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+@media (max-width: 1000px) {
+  .clubs-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .create-form {
+    grid-template-columns: 1fr;
+  }
+}
+

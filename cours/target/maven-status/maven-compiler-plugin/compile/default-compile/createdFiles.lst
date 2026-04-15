@@ -1,0 +1,6 @@
+com\example\cours\security\SecurityConfig.class
+com\example\cours\controller\CoursController.class
+com\example\cours\service\CoursService.class
+com\example\cours\entity\Cours.class
+com\example\cours\repository\CoursRepository.class
+com\example\cours\CoursApplication.class

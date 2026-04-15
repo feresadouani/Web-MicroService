@@ -1,0 +1,56 @@
+<div class="transit-page">
+  <app-user-navbar [active]="'courses'"></app-user-navbar>
+
+  <section class="section section-cours">
+    <div class="section-header">
+      <h1>My Courses</h1>
+      <p>Courses are shown when your email is assigned as the professor or enrolled as a student</p>
+    </div>
+
+    <div class="state-container" *ngIf="loading">
+      <div class="spinner"></div>
+      <p class="state-text">Loading courses...</p>
+    </div>
+
+    <div class="state-container error" *ngIf="!loading && error">
+      <span class="state-icon">⚠️</span>
+      <p class="state-text">{{ error }}</p>
+    </div>
+
+    <div class="state-container" *ngIf="!loading && !error && !hasAnyCoursAvailable()">
+      <span class="state-icon">📚</span>
+      <p class="state-text">No course is visible yet. A course will appear once your email is assigned to it as professor or student.</p>
+    </div>
+
+    <div class="cours-grid" *ngIf="!loading && !error && hasAnyCoursAvailable()">
+      <article
+        class="cours-card"
+        *ngFor="let cours of visibleCours"
+        [routerLink]="['/portal/cours', cours.id]"
+        tabindex="0"
+        role="button"
+        [attr.aria-label]="'Open details for ' + cours.title">
+        <div class="cours-card-header">
+          <h3>{{ cours.title }}</h3>
+          <span class="cours-category">{{ cours.category || 'General' }}</span>
+        </div>
+
+        <p class="cours-content">{{ cours.content }}</p>
+
+        <div class="cours-meta">
+          <p><strong>Professor:</strong> {{ cours.professeur }}</p>
+          <p><strong>Students:</strong> {{ getStudentCount(cours) }}</p>
+          <p><strong>Author:</strong> {{ cours.author }}</p>
+        </div>
+
+        <div class="module-list" *ngIf="getModules(cours).length > 0">
+          <span class="module-chip" *ngFor="let module of getModules(cours)">{{ module }}</span>
+        </div>
+
+        <div class="cours-card-footer">
+          <span class="open-link">Open course details →</span>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>

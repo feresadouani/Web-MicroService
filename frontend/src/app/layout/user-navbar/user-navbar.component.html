@@ -1,0 +1,20 @@
+<header class="topbar">
+  <div class="brand-section">
+    <div class="brand">📚 Education Portal</div>
+    <p class="brand-subtitle">Learn, practice, and track your progress</p>
+  </div>
+  <nav class="nav">
+    <a routerLink="/portal" class="nav-link" [class.active-link]="isActive('home')">Home</a>
+    <a routerLink="/portal/courses" class="nav-link" [class.active-link]="isActive('courses')">My Courses</a>
+    <a routerLink="/event" class="nav-link" [class.active-link]="isActive('events')">Events</a>
+    <a routerLink="/reservations" class="nav-link" [class.active-link]="isActive('reservations')">Reservations</a>
+    <a routerLink="/reclamations" class="nav-link" [class.active-link]="isActive('reclamations')">Reclamations</a>
+    <a routerLink="/portal/profile" class="nav-link" [class.active-link]="isActive('profile')">My Profile</a>
+    <a *ngIf="showAdminDashboard" routerLink="/admin/dashboard" class="nav-link">Dashboard Admin</a>
+    <a *ngIf="showSectionLinks" href="#about" class="nav-link">About</a>
+    <a *ngIf="showSectionLinks" href="#courses" class="nav-link">Courses</a>
+    <a *ngIf="showSectionLinks" href="#features" class="nav-link">Features</a>
+    <a *ngIf="showSectionLinks" href="#contact" class="nav-link">Contact</a>
+    <button type="button" class="logout-btn" (click)="logout()">Log out</button>
+  </nav>
+</header>
