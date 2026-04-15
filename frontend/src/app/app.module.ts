@@ -19,6 +19,7 @@ import { CoursComponent } from './cours/cours.component';
 import { UserEventsComponent } from './user-events/user-events.component';
 import { AddEventComponent } from './admin-dashboard/add-event/add-event.component';
 import { AdminEventsComponent } from './admin-dashboard/admin-events/admin-events.component';
+import { ClubsComponent } from './clubs/clubs.component';
 import { CourseDetailsComponent } from './course-details/course-details.component';
 import { UserCoursesComponent } from './user-courses/user-courses.component';
 import { AddReclamationComponent } from './reclamations/add-reclamation/add-reclamation.component';
@@ -64,7 +65,9 @@ import { UserNavbarComponent } from './layout/user-navbar/user-navbar.component'
     AdminEventsComponent,
     CourseDetailsComponent,
     UserCoursesComponent,
-    UserNavbarComponent
+    UserNavbarComponent,
+    AdminEventsComponent,
+    ClubsComponent
   ],
   imports: [
     BrowserModule,

@@ -13,7 +13,14 @@ export class AdminDashboardComponent implements OnInit {
   userMiniStatLoading = true;
   userMiniStatError = false;
 
-  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
+  menuItems: SidebarItem[] = [
+    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
+    { label: 'Users', route: ['/admin', 'users'] },
+    { label: 'Cours', route: ['/admin', 'cours'] },
+    { label: 'Events', route: ['/admin', 'events'] },
+    { label: 'Add Event', route: ['/admin', 'events', 'add'] },
+    { label: 'Clubs', route: ['/admin', 'clubs'] }
+  ];
 
   kpis: { title: string; value: string; trend: string; icon: 'building' | 'chart' | 'money' }[] = [
     { title: 'Companies', value: '456', trend: '+8% from last month', icon: 'building' },

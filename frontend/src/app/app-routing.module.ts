@@ -19,6 +19,7 @@ import { EditReclamationComponent } from './reclamations/edit-reclamation/edit-r
 import { AdminReclamationDetailComponent } from './admin-dashboard/admin-reclamation-detail/admin-reclamation-detail.component';
 import { CourseDetailsComponent } from './course-details/course-details.component';
 import { UserCoursesComponent } from './user-courses/user-courses.component';
+import { ClubsComponent } from './clubs/clubs.component';
 
 const routes: Routes = [
   {
@@ -45,6 +46,8 @@ const routes: Routes = [
       { path: 'users', component: UsersComponent },
       { path: 'cours', component: CoursComponent },
       { path: 'events', component: AdminEventsComponent },
+      { path: 'events/add', component: AddEventComponent },
+      { path: 'clubs', component: ClubsComponent }
       { path: 'events/add', component: AddEventComponent },
       { path: 'reservations', component: ReservationsComponent },
       { path: 'reclamations', component: AdminReclamationsComponent },
