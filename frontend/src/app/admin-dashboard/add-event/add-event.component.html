@@ -1,0 +1,100 @@
+<div class="add-event-container">
+  <mat-card class="event-card">
+    <mat-card-header>
+      <mat-card-title>Add New Event</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <!-- Success Alert -->
+      <div *ngIf="showSuccessAlert" class="alert alert-success">
+        <span>{{ successMessage }}</span>
+        <button mat-icon-button (click)="closeSuccessAlert()" class="close-btn">
+          <span>×</span>
+        </button>
+      </div>
+
+      <!-- Error Alert -->
+      <div *ngIf="showErrorAlert" class="alert alert-error">
+        <span>{{ errorMessage }}</span>
+        <button mat-icon-button (click)="closeErrorAlert()" class="close-btn">
+          <span>×</span>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+        <!-- Event Name Field -->
+        <mat-form-field class="full-width">
+          <mat-label>Event Name <span class="required">*</span></mat-label>
+          <input
+            matInput
+            placeholder="Enter event name"
+            formControlName="name"
+            [attr.aria-label]="'Event name'" />
+          <mat-error *ngIf="name?.hasError('required')">Event name is required</mat-error>
+          <mat-error *ngIf="name?.hasError('minlength')">Event name must be at least 3 characters</mat-error>
+        </mat-form-field>
+
+        <!-- Event Description Field -->
+        <mat-form-field class="full-width">
+          <mat-label>Description <span class="required">*</span></mat-label>
+          <textarea
+            matInput
+            placeholder="Enter event description"
+            formControlName="description"
+            rows="4"
+            [attr.aria-label]="'Event description'"></textarea>
+          <mat-error *ngIf="description?.hasError('required')">Description is required</mat-error>
+          <mat-error *ngIf="description?.hasError('minlength')">Description must be at least 10 characters</mat-error>
+        </mat-form-field>
+
+        <!-- Event Location Field -->
+        <mat-form-field class="full-width">
+          <mat-label>Location <span class="required">*</span></mat-label>
+          <input
+            matInput
+            placeholder="Enter event location"
+            formControlName="location"
+            [attr.aria-label]="'Event location'" />
+          <mat-error *ngIf="location?.hasError('required')">Location is required</mat-error>
+          <mat-error *ngIf="location?.hasError('minlength')">Location must be at least 3 characters</mat-error>
+        </mat-form-field>
+
+        <!-- Event Date Field -->
+        <mat-form-field class="full-width">
+          <mat-label>Event Date <span class="required">*</span></mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            formControlName="date"
+            [attr.aria-label]="'Event date'" />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="date?.hasError('required')">Event date is required</mat-error>
+        </mat-form-field>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            type="submit"
+            mat-raised-button
+            color="primary"
+            [disabled]="isLoading || eventForm.invalid"
+            class="action-button">
+            <mat-spinner *ngIf="isLoading" diameter="20" class="spinner"></mat-spinner>
+            <span *ngIf="!isLoading">Add Event</span>
+            <span *ngIf="isLoading">Processing...</span>
+          </button>
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="resetForm()"
+            [disabled]="isLoading"
+            class="action-button">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -3,14 +3,12 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-/** Réponse HAL Spring Data REST pour une collection */
 interface HalUsersResponse {
   _embedded?: {
     users?: HalUserItem[];
   };
 }
 
-/** Représentation HAL d’un user (id + éventuellement lien self) */
 type HalUserItem = UserDto & {
   _links?: { self?: { href?: string } };
 };
@@ -25,12 +23,27 @@ export interface UserDto {
   birthday?: string;
 }
 
+export interface CurrentUserProfile {
+  authenticated: boolean;
+  name?: string;
+  preferred_username?: string;
+  email?: string;
+  sub?: string;
+  dbUserId?: number;
+  firstname?: string;
+  lastname?: string;
+  birthday?: string;
+  role?: string;
+  dbSyncError?: string;
+}
+
 export interface CreateUserPayload {
   firstname: string;
   lastname: string;
   email: string;
   password: string;
   role: 'USER' | 'ADMIN';
+  birthday?: string;
 }
 
 export interface UpdateUserPayload {
@@ -38,7 +51,13 @@ export interface UpdateUserPayload {
   lastname: string;
   email: string;
   role: 'USER' | 'ADMIN';
-  /** Si renseigné, le mot de passe est mis à jour (JSON Merge Patch). */
+  password?: string;
+}
+
+export interface UpdateMyProfilePayload {
+  firstname?: string;
+  lastname?: string;
+  birthday?: string;
   password?: string;
 }
 
@@ -69,13 +88,29 @@ export class UserApiService {
 
   constructor(private readonly http: HttpClient) {}
 
-  getCurrentUser(): Observable<unknown> {
-    return this.http.get(`${this.gatewayBaseUrl}/users/me`);
+  getCurrentUser(): Observable<CurrentUserProfile> {
+    return this.http.get<CurrentUserProfile>(`${this.gatewayBaseUrl}/users/me`);
   }
 
-  /**
-   * Liste des utilisateurs (HAL). Avec {@code search}, appelle l’API de recherche admin (JSON tableau).
-   */
+  updateMyProfile(payload: UpdateMyProfilePayload): Observable<UserDto> {
+    const body: Record<string, string> = {};
+    if (payload.firstname != null) {
+      body['firstname'] = payload.firstname;
+    }
+    if (payload.lastname != null) {
+      body['lastname'] = payload.lastname;
+    }
+    if (payload.birthday != null) {
+      body['birthday'] = payload.birthday;
+    }
+    if (payload.password != null && payload.password.length > 0) {
+      body['password'] = payload.password;
+    }
+    return this.http.patch<UserDto>(`${this.gatewayBaseUrl}/users/me`, body, {
+      headers: MERGE_PATCH_HEADERS
+    });
+  }
+
   getUsers(search?: string | null): Observable<UserDto[]> {
     const q = search?.trim();
     if (q) {
@@ -88,19 +123,19 @@ export class UserApiService {
   }
 
   createUser(payload: CreateUserPayload): Observable<UserDto> {
-    const body = {
+    const body: Record<string, string> = {
       firstname: payload.firstname,
       lastname: payload.lastname,
       email: payload.email,
       password: payload.password,
       role: payload.role
     };
+    if (payload.birthday != null && payload.birthday.length > 0) {
+      body['birthday'] = payload.birthday;
+    }
     return this.http.post<UserDto>(`${this.gatewayBaseUrl}/users`, body);
   }
 
-  /**
-   * Mise à jour partielle via Spring Data REST (PATCH + merge-patch+json).
-   */
   updateUser(id: number, payload: UpdateUserPayload): Observable<UserDto> {
     const body: Record<string, string> = {
       firstname: payload.firstname,

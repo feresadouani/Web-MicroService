@@ -29,7 +29,6 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        /* Profil du token JWT : user ou admin */
                         .requestMatchers(HttpMethod.PATCH, "/users/me")
                                 .hasAnyRole("CLIENT_USER", "CLIENT_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users/me").authenticated()

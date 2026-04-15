@@ -2,8 +2,10 @@ package com.example.user.Controller;
 
 import com.example.user.Entity.User;
 import com.example.user.Repository.UserRepository;
+import com.example.user.keycloak.KeycloakAdminService;
 import com.example.user.dto.ProfilePatchDto;
-import com.example.user.service.LocalUserFromJwtService;
+import com.example.user.Service.LocalUserFromJwtService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,26 +24,25 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
+@Slf4j
 public class UserController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final LocalUserFromJwtService localUserFromJwtService;
+    private final KeycloakAdminService keycloakAdminService;
 
     public UserController(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            LocalUserFromJwtService localUserFromJwtService) {
+            LocalUserFromJwtService localUserFromJwtService,
+            KeycloakAdminService keycloakAdminService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.localUserFromJwtService = localUserFromJwtService;
+        this.keycloakAdminService = keycloakAdminService;
     }
 
-
-    /**
-     * Recherche d’utilisateurs (prénom, nom, email) réservée aux admins.
-     * Si {@code q} est vide ou absent, renvoie toute la liste (même comportement que la collection REST).
-     */
     @GetMapping("/admin/search")
     public List<User> adminSearchUsers(@RequestParam(name = "q", required = false) String q) {
         if (q == null || q.isBlank()) {
@@ -65,18 +66,19 @@ public class UserController {
             try {
                 User local = localUserFromJwtService.ensureLocalUserFromJwt(jwt);
                 response.put("dbUserId", local.getId());
-            } catch (IllegalArgumentException ex) {
-                response.put("dbSyncError", ex.getMessage());
+                response.put("firstname", local.getFirstname());
+                response.put("lastname", local.getLastname());
+                response.put("birthday", local.getBirthday());
+                response.put("role", local.getRole());
+                response.put("email", local.getEmail());
+            } catch (IllegalArgumentException ignored) {
+                response.put("dbSyncError", "An error occurred while synchronizing your account.");
             }
         }
 
         return response;
     }
 
-    /**
-     * Mise à jour du profil de l’utilisateur connecté uniquement (email issu du JWT).
-     * Les écritures sur la collection /users (Data REST) restent réservées au client_admin.
-     */
     @PatchMapping("/me")
     public User patchMyProfile(Authentication authentication, @RequestBody ProfilePatchDto body) {
         if (authentication == null || !(authentication.getPrincipal() instanceof Jwt jwt)) {
@@ -85,8 +87,8 @@ public class UserController {
         User user;
         try {
             user = localUserFromJwtService.ensureLocalUserFromJwt(jwt);
-        } catch (IllegalArgumentException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (IllegalArgumentException ignored) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An error occurred while updating your profile.");
         }
 
         if (body.getFirstname() != null) {
@@ -98,10 +100,18 @@ public class UserController {
         if (body.getBirthday() != null) {
             user.setBirthday(body.getBirthday());
         }
+        String rawPassword = null;
         if (body.getPassword() != null && !body.getPassword().isBlank()) {
-            user.setPassword(passwordEncoder.encode(body.getPassword()));
+            rawPassword = body.getPassword();
+            user.setPassword(passwordEncoder.encode(rawPassword));
         }
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        try {
+            keycloakAdminService.syncUserUpdateInKeycloak(saved, saved.getEmail(), rawPassword);
+        } catch (RuntimeException e) {
+            log.warn("Keycloak sync failed after /users/me patch for {}: {}", saved.getEmail(), e.getMessage());
+        }
+        return saved;
     }
 }

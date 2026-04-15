@@ -5,7 +5,7 @@ class KeycloakService {
 
   init(): Promise<boolean> {
     this._keycloak = new Keycloak({
-      url: 'http://localhost:8080',
+      url: 'http://localhost:9090',
       realm: 'spring',
       clientId: 'frontend'
     });
@@ -53,9 +53,22 @@ class KeycloakService {
     return this._keycloak.tokenParsed;
   }
 
-  /**
-   * Rôles realm + clients Keycloak (comme sur la gateway : realm_access + resource_access).
-   */
+  getUserEmail(): string {
+    const parsed = this._keycloak?.tokenParsed as Record<string, unknown> | undefined;
+    const email = parsed?.['email'];
+    if (typeof email === 'string' && email.trim().length > 0) {
+      return email.trim().toLowerCase();
+    }
+
+    const preferredUsername = parsed?.['preferred_username'];
+    if (typeof preferredUsername === 'string' && preferredUsername.trim().length > 0) {
+      return preferredUsername.trim().toLowerCase();
+    }
+
+    const sub = parsed?.['sub'];
+    return typeof sub === 'string' ? sub : '';
+  }
+
   getRoleNames(): string[] {
     const parsed = this._keycloak?.tokenParsed as Record<string, unknown> | undefined;
     if (!parsed) {
@@ -73,24 +86,16 @@ class KeycloakService {
     return [...names];
   }
 
-  /** Rôle client Keycloak « admin » (une seule convention : {@code client_admin}). */
   private static readonly KEYCLOAK_ADMIN = 'CLIENT_ADMIN';
 
-  /** Rôle client Keycloak « utilisateur » ({@code client_user}). */
   private static readonly KEYCLOAK_USER = 'CLIENT_USER';
 
-  /**
-   * Accès back-office : uniquement le rôle client {@code client_admin}.
-   */
   isAdmin(): boolean {
     return this.getRoleNames().some(
       (r) => this.normalizeRoleKey(r) === KeycloakService.KEYCLOAK_ADMIN
     );
   }
 
-  /**
-   * Utilisateur standard côté Keycloak : {@code client_user}.
-   */
   isClientUser(): boolean {
     return this.getRoleNames().some(
       (r) => this.normalizeRoleKey(r) === KeycloakService.KEYCLOAK_USER
