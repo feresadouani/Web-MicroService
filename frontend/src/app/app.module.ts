@@ -14,6 +14,7 @@ import { FooterComponent } from './layout/footer/footer.component';
 import { UsersComponent } from './users/users.component';
 import { PostLoginRedirectComponent } from './post-login-redirect/post-login-redirect.component';
 import { UserPortalComponent } from './user-portal/user-portal.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
 import { AddEventComponent } from './admin-dashboard/add-event/add-event.component';
 import { AdminEventsComponent } from './admin-dashboard/admin-events/admin-events.component';
 
@@ -32,6 +33,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     UsersComponent,
     PostLoginRedirectComponent,
     UserPortalComponent,
+    UserProfileComponent,
     SidebarComponent,
     NavbarComponent,
     FooterComponent,
