@@ -16,6 +16,12 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  padding: 24px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.portal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -290,6 +296,11 @@
   margin: 0 0 20px;
   line-height: 1.6;
   flex-grow: 1;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .event-meta-container {
@@ -570,4 +581,113 @@
   .profiles {
     grid-template-columns: 1fr;
   }
+}
+
+.ghost-btn,
+.primary-btn,
+.danger-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.ghost-btn {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.primary-btn {
+  background: #0ea5e9;
+  color: white;
+}
+
+.danger-btn {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.courses {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.course-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.course-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.course-head h3 {
+  margin: 0;
+}
+
+.badge {
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.badge-on {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.meta {
+  margin: 10px 0 8px;
+  color: #475569;
+  font-size: 13px;
+}
+
+.meta span {
+  margin: 0 6px;
+}
+
+.small {
+  margin-top: 12px;
+}
+
+.content {
+  margin: 0;
+  color: #1f2937;
+}
+
+.module-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.module-chip {
+  background: #dbeafe;
+  color: #1e3a8a;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
+.actions-row {
+  margin-top: 12px;
+}
+
+.muted {
+  color: #64748b;
+}
+
+.error {
+  color: #b91c1c;
+  margin: 10px 0;
 }

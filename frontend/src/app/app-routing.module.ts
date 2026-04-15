@@ -8,6 +8,7 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 import { AdminGuard } from './guards/admin.guard';
 import { AddEventComponent } from './admin-dashboard/add-event/add-event.component';
 import { AdminEventsComponent } from './admin-dashboard/admin-events/admin-events.component';
+import { CoursComponent } from './cours/cours.component';
 
 const routes: Routes = [
   {
@@ -25,6 +26,7 @@ const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: AdminDashboardComponent },
       { path: 'users', component: UsersComponent },
+      { path: 'cours', component: CoursComponent },
       { path: 'events', component: AdminEventsComponent },
       { path: 'events/add', component: AddEventComponent }
     ]

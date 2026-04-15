@@ -14,6 +14,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   menuItems: SidebarItem[] = [
     { label: 'Dashboard', route: ['/admin', 'dashboard'] },
     { label: 'Users', route: ['/admin', 'users'] },
+    { label: 'Cours', route: ['/admin', 'cours'] },
     { label: 'Events', route: ['/admin', 'events'] },
     { label: 'Add Event', route: ['/admin', 'events', 'add'] }
   ];
