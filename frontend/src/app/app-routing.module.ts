@@ -10,6 +10,7 @@ import { AdminGuard } from './guards/admin.guard';
 import { AddEventComponent } from './admin-dashboard/add-event/add-event.component';
 import { AdminEventsComponent } from './admin-dashboard/admin-events/admin-events.component';
 import { CoursComponent } from './cours/cours.component';
+import { UserReservationsComponent } from './user-reservations/user-reservations.component';
 
 const routes: Routes = [
   {
@@ -20,6 +21,7 @@ const routes: Routes = [
   { path: 'portal', component: UserPortalComponent },
   { path: 'portal/profile', component: UserProfileComponent },
   { path: 'events', component: UserPortalComponent },
+  { path: 'reservations', component: UserReservationsComponent },
   {
     path: 'admin',
     canActivateChild: [AdminGuard],

@@ -21,31 +21,28 @@
           <option [ngValue]="0" disabled>-- Sélectionner un utilisateur --</option>
           <option *ngFor="let user of users" [ngValue]="user.id">{{ user.firstname }}</option>
         </select>
-        <input [(ngModel)]="editingReservation.salleNum" name="edit-salle-num" type="number" placeholder="Salle Num" required />
-        <input [(ngModel)]="editingReservation.reservationDate" name="edit-date" type="datetime-local" placeholder="Date de réservation" required />
+        <input [(ngModel)]="editingReservation.salleNum" name="edit-salle-num" type="number" min="1" placeholder="Salle Num" required />
         <select [(ngModel)]="editingReservation.status" name="edit-status">
+          <option value="EMPTY">EMPTY</option>
           <option value="PENDING">PENDING</option>
           <option value="CONFIRMED">CONFIRMED</option>
           <option value="CANCELLED">CANCELLED</option>
         </select>
-        <textarea [(ngModel)]="editingReservation.notes" name="edit-notes" placeholder="Notes" style="grid-column: span 2;"></textarea>
         <div class="form-actions-inline">
           <button type="submit" class="primary-btn">Enregistrer</button>
           <button type="button" class="ghost-btn" (click)="cancelEdit()">Annuler</button>
         </div>
+        <p class="error" *ngIf="editError">{{ editError }}</p>
       </form>
     </article>
 
     <article class="card" *ngIf="showCreateForm">
-      <h3>Nouvelle réservation</h3>
+      <h3>New Salle</h3>
+      
       <form class="create-form" (submit)="$event.preventDefault(); createReservation();">
-        <select [(ngModel)]="newReservation.userId" name="user-id" required>
-          <option [ngValue]="0" disabled>-- Sélectionner un utilisateur --</option>
-          <option *ngFor="let user of users" [ngValue]="user.id">{{ user.firstname }}</option>
-        </select>
-        <input [(ngModel)]="newReservation.salleNum" name="salle-num" type="number" placeholder="Salle Num" required />
-        <textarea [(ngModel)]="newReservation.notes" name="notes" placeholder="Notes" style="grid-column: span 2;"></textarea>
-        <button type="submit" class="primary-btn">Créer</button>
+        <input [(ngModel)]="newReservation.salleNum" name="salle-num" type="number" min="1" placeholder="Salle Num" required style="grid-column: span 2;" />
+        <p class="error" *ngIf="createError" style="grid-column: span 2; margin-top: 0;">{{ createError }}</p>
+        <button type="submit" class="primary-btn" style="grid-column: span 2;">Créer</button>
       </form>
     </article>
 
@@ -77,7 +74,7 @@
             <th>Salle Num</th>
             <th>Date de réservation</th>
             <th>Statut</th>
-            <th>Notes</th>
+            
             <th class="col-actions">Actions</th>
           </tr>
         </thead>
@@ -91,9 +88,10 @@
                 {{ reservation.status }}
               </span>
             </td>
-            <td>{{ reservation.notes || '-' }}</td>
+            
             <td class="col-actions">
               <div class="row-actions">
+                <button *ngIf="reservation.status === 'EMPTY'" type="button" class="primary-btn btn-sm" (click)="reserveRoom(reservation)">Réserver</button>
                 <button type="button" class="ghost-btn btn-sm" (click)="startEdit(reservation)">Modifier</button>
                 <button type="button" class="danger-btn btn-sm" (click)="deleteReservation(reservation)">Supprimer</button>
               </div>

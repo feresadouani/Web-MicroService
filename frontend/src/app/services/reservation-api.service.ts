@@ -7,7 +7,7 @@ export interface ReservationDto {
   userId: number;
   salleNum: number;
   reservationDate: string;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'EMPTY';
   notes?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -17,7 +17,7 @@ export interface CreateReservationPayload {
   userId: number;
   salleNum: number;
   reservationDate: string;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'EMPTY';
   notes?: string;
 }
 
@@ -25,7 +25,7 @@ export interface UpdateReservationPayload {
   userId?: number;
   salleNum?: number;
   reservationDate?: string;
-  status?: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+  status?: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'EMPTY';
   notes?: string;
 }
 

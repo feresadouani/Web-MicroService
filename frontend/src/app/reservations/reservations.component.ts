@@ -20,15 +20,19 @@ export class ReservationsComponent implements OnInit {
   loading = false;
   showCreateForm = false;
   error = '';
+  createError = '';
+  editError = '';
   searchQuery = '';
 
   newReservation: CreateReservationPayload = {
     userId: 0,
     salleNum: 0,
     reservationDate: '',
-    status: 'PENDING',
+    status: 'EMPTY',
     notes: ''
   };
+
+  currentDbUserId?: number;
 
   editingReservation: ReservationDto | null = null;
 
@@ -40,6 +44,9 @@ export class ReservationsComponent implements OnInit {
   ngOnInit(): void {
     this.fetchReservations();
     this.fetchUsers();
+    this.userApiService.getCurrentUser().subscribe(user => {
+      this.currentDbUserId = user.dbUserId;
+    });
   }
 
   fetchUsers(): void {
@@ -78,9 +85,16 @@ export class ReservationsComponent implements OnInit {
   }
 
   createReservation(): void {
-    this.error = '';
-    if (!this.newReservation.userId || !this.newReservation.salleNum) {
-      this.error = 'userId et salleNum sont obligatoires';
+    this.createError = '';
+    
+    if (!this.newReservation.salleNum || this.newReservation.salleNum <= 0) {
+      this.createError = 'La salle num doit être un nombre positif et supérieur à zéro';
+      return;
+    }
+
+    const exists = this.reservations.some(r => r.salleNum === this.newReservation.salleNum);
+    if (exists) {
+      this.createError = 'Une réservation pour cette salle (Salle Num: ' + this.newReservation.salleNum + ') existe déjà';
       return;
     }
 
@@ -92,7 +106,7 @@ export class ReservationsComponent implements OnInit {
 
     const payload: CreateReservationPayload = {
       ...this.newReservation,
-      status: 'PENDING',
+      status: 'EMPTY',
       reservationDate: localDateTime
     };
 
@@ -103,7 +117,7 @@ export class ReservationsComponent implements OnInit {
           userId: 0,
           salleNum: 0,
           reservationDate: '',
-          status: 'PENDING',
+          status: 'EMPTY',
           notes: ''
         };
         this.fetchReservations();
@@ -111,13 +125,13 @@ export class ReservationsComponent implements OnInit {
       error: (err) => {
         console.error("Full error object: ", err);
         const serverMsg = typeof err.error === 'string' ? err.error : err.message;
-        this.error = `Erreur création réservation: ${err.status} ${err.statusText} - ${serverMsg}`;
+        this.createError = `Erreur création réservation: ${err.status} ${err.statusText} - ${serverMsg}`;
       }
     });
   }
 
   startEdit(reservation: ReservationDto): void {
-    this.error = '';
+    this.editError = '';
     if (reservation.id == null) {
       this.error = 'Impossible de modifier : identifiant manquant.';
       return;
@@ -136,7 +150,18 @@ export class ReservationsComponent implements OnInit {
       return;
     }
     const id = r.id;
-    this.error = '';
+    this.editError = '';
+    
+    if (!r.salleNum || r.salleNum <= 0) {
+      this.editError = 'La salle num doit être un nombre positif et supérieur à zéro';
+      return;
+    }
+
+    const exists = this.reservations.some(reservation => reservation.salleNum === r.salleNum && reservation.id !== id);
+    if (exists) {
+      this.editError = 'Une réservation pour cette salle (Salle Num: ' + r.salleNum + ') existe déjà';
+      return;
+    }
 
     const updatePayload = {
       userId: r.userId,
@@ -152,7 +177,7 @@ export class ReservationsComponent implements OnInit {
         this.fetchReservations();
       },
       error: (err) => {
-        this.error = `Erreur mise à jour réservation: ${err.status} ${err.statusText}`;
+        this.editError = `Erreur mise à jour réservation: ${err.status} ${err.statusText}`;
       }
     });
   }
@@ -175,6 +200,32 @@ export class ReservationsComponent implements OnInit {
       },
       error: (err) => {
         this.error = `Erreur suppression réservation: ${err.status} ${err.statusText}`;
+      }
+    });
+  }
+
+  reserveRoom(reservation: ReservationDto): void {
+    if (!this.currentDbUserId) {
+      this.error = "Erreur: Utilisateur non connecté ou non trouvé en BD.";
+      return;
+    }
+    if (reservation.id == null) return;
+    
+    // Auto-reserving standard: change status to PENDING and assign to the user
+    const updatePayload = {
+      userId: this.currentDbUserId,
+      salleNum: reservation.salleNum,
+      reservationDate: reservation.reservationDate,
+      status: 'PENDING' as any,
+      notes: reservation.notes
+    };
+
+    this.reservationApiService.updateReservation(reservation.id, updatePayload).subscribe({
+      next: () => {
+        this.fetchReservations();
+      },
+      error: (err) => {
+        this.error = `Erreur réservation: ${err.status} ${err.statusText}`;
       }
     });
   }

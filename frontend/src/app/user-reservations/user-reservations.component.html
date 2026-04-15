@@ -1,0 +1,82 @@
+<div class="transit-page">
+  <header class="topbar">
+    <div class="brand-section">
+      <div class="brand">🎯 Events Portal</div>
+      <p class="brand-subtitle">Reserve a room instantly</p>
+    </div>
+    <nav class="nav">
+      <a routerLink="/portal" class="nav-link">Portal</a>
+      <a routerLink="/events" class="nav-link">Events</a>
+      <a routerLink="/reservations" class="nav-link active-link">Reservations</a>
+      <a routerLink="/portal/profile" class="nav-link">My Profile</a>
+      <button type="button" class="logout-btn" (click)="logout()">Log out</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Available Rooms</h1>
+      <p>Here you can view room availability and make a reservation seamlessly.</p>
+    </div>
+  </section>
+
+  <section class="section section-events">
+    <div class="section-header">
+      <h2>Room Status</h2>
+      <p>Check room availability and apply to reserve one</p>
+    </div>
+
+    <!-- State containers -->
+    <div class="state-container" *ngIf="loading">
+      <div class="spinner"></div>
+      <p class="state-text">Loading rooms...</p>
+    </div>
+    <div class="state-container error" *ngIf="error">
+      <span class="state-icon">❌</span>
+      <p class="state-text">{{ error }}</p>
+    </div>
+
+    <!-- The actual Grid for Reservations matching frontoffice aesthetic -->
+    <div class="events-grid" *ngIf="!loading && !error && reservations.length > 0">
+      <article class="event-card" *ngFor="let reservation of reservations">
+        <div class="event-card-header">
+          <div class="event-icon">🚪</div>
+          <h3>Salle {{ reservation.salleNum }}</h3>
+        </div>
+        
+        <!-- Extracted from exactly what the user wanted: Just salleNum and status -->
+        <p class="event-description">
+          Status: 
+          <span style="font-weight: 600; padding: 2px 6px; border-radius: 4px;" 
+                [class.status-empty]="reservation.status === 'EMPTY'"
+                [class.status-pending]="reservation.status === 'PENDING'"
+                [class.status-confirmed]="reservation.status === 'CONFIRMED'">
+            {{ reservation.status }}
+          </span>
+        </p>
+
+        <div class="event-card-footer" style="display: flex; justify-content: flex-end; width: 100%;">
+          <button 
+            *ngIf="reservation.status === 'EMPTY'"
+            class="subscribe-btn"
+            style="background: #2563eb; color: #fff; width: auto; padding: 0.5rem 1rem;"
+            (click)="reserveRoom(reservation)">
+            Réserver
+          </button>
+          <div *ngIf="reservation.status !== 'EMPTY'" style="color: #64748b; font-size: 0.9rem; padding: 0.5rem 0;">
+            Non disponible
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="state-container" *ngIf="!loading && !error && reservations.length === 0">
+      <span class="state-icon">📭</span>
+      <p class="state-text">No rooms available at the moment.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>&copy; 2026 Events Portal. All rights reserved.</p>
+  </footer>
+</div>

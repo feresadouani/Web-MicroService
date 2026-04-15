@@ -27,6 +27,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {ReservationsComponent} from './reservations/reservations.component';
+import { UserReservationsComponent } from './user-reservations/user-reservations.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -42,7 +43,8 @@ import {ReservationsComponent} from './reservations/reservations.component';
     NavbarComponent,
     FooterComponent,
     AddEventComponent,
-    AdminEventsComponent
+    AdminEventsComponent,
+    UserReservationsComponent
   ],
   imports: [
     BrowserModule,

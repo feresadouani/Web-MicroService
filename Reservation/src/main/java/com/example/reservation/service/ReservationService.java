@@ -14,6 +14,16 @@ import java.util.Optional;
 public class ReservationService {
     
     private final ReservationRepository reservationRepository;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
+    @jakarta.annotation.PostConstruct
+    public void fixStatusColumn() {
+        try {
+            jdbcTemplate.execute("ALTER TABLE reservations MODIFY COLUMN status VARCHAR(255) NOT NULL");
+        } catch (Exception e) {
+            System.err.println("Database column modification failed or already altered: " + e.getMessage());
+        }
+    }
     
     /**
      * Get all reservations
@@ -69,7 +79,7 @@ public class ReservationService {
      */
     public Reservation createReservation(Reservation reservation) {
         if (reservation.getStatus() == null) {
-            reservation.setStatus(ReservationStatus.PENDING);
+            reservation.setStatus(ReservationStatus.EMPTY);
         }
         return reservationRepository.save(reservation);
     }

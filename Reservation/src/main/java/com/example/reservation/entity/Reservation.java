@@ -48,7 +48,7 @@ public class Reservation {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (status == null) {
-            status = ReservationStatus.PENDING;
+            status = ReservationStatus.EMPTY;
         }
     }
     
