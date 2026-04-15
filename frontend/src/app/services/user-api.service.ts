@@ -23,6 +23,20 @@ export interface UserDto {
   birthday?: string;
 }
 
+export interface CurrentUserProfile {
+  authenticated: boolean;
+  name?: string;
+  preferred_username?: string;
+  email?: string;
+  sub?: string;
+  dbUserId?: number;
+  firstname?: string;
+  lastname?: string;
+  birthday?: string;
+  role?: string;
+  dbSyncError?: string;
+}
+
 export interface CreateUserPayload {
   firstname: string;
   lastname: string;
@@ -37,6 +51,13 @@ export interface UpdateUserPayload {
   lastname: string;
   email: string;
   role: 'USER' | 'ADMIN';
+  password?: string;
+}
+
+export interface UpdateMyProfilePayload {
+  firstname?: string;
+  lastname?: string;
+  birthday?: string;
   password?: string;
 }
 
@@ -67,8 +88,27 @@ export class UserApiService {
 
   constructor(private readonly http: HttpClient) {}
 
-  getCurrentUser(): Observable<unknown> {
-    return this.http.get(`${this.gatewayBaseUrl}/users/me`);
+  getCurrentUser(): Observable<CurrentUserProfile> {
+    return this.http.get<CurrentUserProfile>(`${this.gatewayBaseUrl}/users/me`);
+  }
+
+  updateMyProfile(payload: UpdateMyProfilePayload): Observable<UserDto> {
+    const body: Record<string, string> = {};
+    if (payload.firstname != null) {
+      body['firstname'] = payload.firstname;
+    }
+    if (payload.lastname != null) {
+      body['lastname'] = payload.lastname;
+    }
+    if (payload.birthday != null) {
+      body['birthday'] = payload.birthday;
+    }
+    if (payload.password != null && payload.password.length > 0) {
+      body['password'] = payload.password;
+    }
+    return this.http.patch<UserDto>(`${this.gatewayBaseUrl}/users/me`, body, {
+      headers: MERGE_PATCH_HEADERS
+    });
   }
 
   getUsers(search?: string | null): Observable<UserDto[]> {
