@@ -2,7 +2,6 @@ package com.example.user.Service;
 
 import com.example.user.Entity.User;
 import com.example.user.Repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -11,11 +10,15 @@ import java.util.UUID;
 
 
 @Service
-@RequiredArgsConstructor
 public class LocalUserFromJwtService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public LocalUserFromJwtService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public User ensureLocalUserFromJwt(Jwt jwt) {
         String email = jwt.getClaimAsString("email");

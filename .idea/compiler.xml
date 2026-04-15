@@ -33,12 +33,22 @@
         </processorPath>
         <module name="reservation" />
       </profile>
+      <profile name="Annotation profile for clubs" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+        </processorPath>
+        <module name="clubs" />
+      </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="ApiGateway" options="-parameters" />
       <module name="Config" options="-parameters" />
+      <module name="clubs" options="-parameters" />
       <module name="cours" options="-parameters" />
       <module name="eureka" options="-parameters" />
       <module name="event" options="-parameters" />

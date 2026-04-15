@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SidebarItem } from '../layout/sidebar/sidebar.component';
+import { ADMIN_SIDEBAR_ITEMS } from '../layout/sidebar/admin-sidebar-items';
 import {
   ClubApiService,
   ClubDto,
@@ -15,14 +16,7 @@ import {
   styleUrl: './clubs.component.css'
 })
 export class ClubsComponent implements OnInit {
-  menuItems: SidebarItem[] = [
-    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
-    { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Cours', route: ['/admin', 'cours'] },
-    { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Add Event', route: ['/admin', 'events', 'add'] },
-    { label: 'Clubs', route: ['/admin', 'clubs'] }
-  ];
+  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
 
   clubs: ClubDto[] = [];
   loading = false;

@@ -15,12 +15,7 @@ import { UserApiService, UserDto } from '../services/user-api.service';
   styleUrl: './cours.component.css'
 })
 export class CoursComponent implements OnInit {
-  menuItems: SidebarItem[] = [
-    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
-    { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Cours', route: ['/admin', 'cours'] },
-    { label: 'Clubs', route: ['/admin', 'clubs'] }
-  ];
+  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
 
   coursList: CoursDto[] = [];
   loading = false;

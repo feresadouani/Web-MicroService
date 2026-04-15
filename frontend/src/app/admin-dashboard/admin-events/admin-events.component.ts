@@ -10,13 +10,7 @@ import { EventService } from '../../services/event.service';
   styleUrl: './admin-events.component.css'
 })
 export class AdminEventsComponent implements OnInit {
-  menuItems: SidebarItem[] = [
-    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
-    { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Add Event', route: ['/admin', 'events', 'add'] },
-    { label: 'Clubs', route: ['/admin', 'clubs'] }
-  ];
+  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
 
   events: Event[] = [];
   loading = false;

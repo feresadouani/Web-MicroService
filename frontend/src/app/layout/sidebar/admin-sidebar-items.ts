@@ -6,6 +6,7 @@ export const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
   { label: 'Cours', route: ['/admin', 'cours'] },
   { label: 'Events', route: ['/admin', 'events'] },
   { label: 'Add Event', route: ['/admin', 'events', 'add'] },
+  { label: 'Clubs', route: ['/admin', 'clubs'] },
   { label: 'Reservations', route: ['/admin', 'reservations'] },
   { label: 'Reclamations', route: ['/admin', 'reclamations'] }
 ];

@@ -47,7 +47,7 @@ const routes: Routes = [
       { path: 'cours', component: CoursComponent },
       { path: 'events', component: AdminEventsComponent },
       { path: 'events/add', component: AddEventComponent },
-      { path: 'clubs', component: ClubsComponent }
+      { path: 'clubs', component: ClubsComponent },
       { path: 'events/add', component: AddEventComponent },
       { path: 'reservations', component: ReservationsComponent },
       { path: 'reclamations', component: AdminReclamationsComponent },
