@@ -1,0 +1,50 @@
+<div class="layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems"></app-sidebar>
+
+  <section class="content">
+    <app-navbar></app-navbar>
+
+    <section class="header-row">
+      <h1>Consulter réclamation</h1>
+      <div class="header-actions">
+        <a class="ghost-btn" routerLink="/admin/reclamations">Back</a>
+        <button type="button" class="primary-btn" (click)="save()" [disabled]="saving || loading">
+          {{ saving ? 'Saving...' : 'Save' }}
+        </button>
+      </div>
+    </section>
+
+    <article class="card">
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p class="success" *ngIf="success">{{ success }}</p>
+      <p *ngIf="loading">Loading...</p>
+
+      <ng-container *ngIf="!loading && row">
+        <h3>{{ row.title }}</h3>
+        <p class="desc">{{ row.description }}</p>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Statut</span>
+            <select name="status" [(ngModel)]="status">
+              <option *ngFor="let s of statuses" [ngValue]="s.value">{{ s.label }}</option>
+            </select>
+          </label>
+
+          <label class="field field--full">
+            <span>Reply to user</span>
+            <textarea name="reply" [(ngModel)]="reply" rows="6" placeholder="Write a reply..."></textarea>
+          </label>
+        </div>
+
+        <small class="muted">
+          Created: {{ row.createdAt ? (row.createdAt | date:'medium') : '—' }}
+          · Updated: {{ row.updatedAt ? (row.updatedAt | date:'medium') : '—' }}
+        </small>
+      </ng-container>
+    </article>
+
+    <app-footer [text]="'© 2026 Reclamations Administration'"></app-footer>
+  </section>
+</div>
+

@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .pathMatchers("/public/**").permitAll()
                         .pathMatchers("/admin/**").hasRole("CLIENT_ADMIN")
                         .pathMatchers("/users/**").authenticated()
+                        .pathMatchers("/cours/**").authenticated()
                         .pathMatchers("/events/**","/api/events/**").authenticated()
                         .pathMatchers("/reclamations/**").authenticated()
                         .anyExchange().authenticated()

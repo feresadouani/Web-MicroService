@@ -1,8 +1,5 @@
-<div class="course-details-page">
-  <header class="details-header">
-    <a class="back-link" routerLink="/portal">← Back to portal</a>
-    <a class="profile-link" routerLink="/portal/profile">My Profile</a>
-  </header>
+<div class="transit-page">
+  <app-user-navbar [active]="'courses'"></app-user-navbar>
 
   <section class="state-container" *ngIf="loading">
     <div class="spinner"></div>

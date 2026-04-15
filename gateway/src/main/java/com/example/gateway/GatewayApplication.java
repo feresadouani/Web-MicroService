@@ -30,6 +30,8 @@ public class GatewayApplication {
                         .uri("lb://events"))
                 .route("reclamations", r -> r.path("/reclamations/**")
                         .uri("lb://reclamation-service"))
+                .route("reservations", r -> r.path("/reservations/**")
+                        .uri("lb://reservation-service"))
                 .build();
     }
 }

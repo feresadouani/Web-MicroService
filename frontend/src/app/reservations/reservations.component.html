@@ -1,0 +1,108 @@
+<div class="reservations-layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems">
+  </app-sidebar>
+
+  <section class="reservations-content">
+    <app-navbar></app-navbar>
+
+    <section class="header-row">
+      <div>
+        <h1>Reservations</h1>
+      </div>
+      <button type="button" class="primary-btn" (click)="toggleCreateForm()">
+        {{ showCreateForm ? 'Fermer le formulaire' : 'Ajouter une réservation' }}
+      </button>
+    </section>
+
+    <article class="card" *ngIf="editingReservation">
+      <h3>Modifier la réservation</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); saveEdit();">
+        <select [(ngModel)]="editingReservation.userId" name="edit-user-id" required>
+          <option [ngValue]="0" disabled>-- Sélectionner un utilisateur --</option>
+          <option *ngFor="let user of users" [ngValue]="user.id">{{ user.firstname }}</option>
+        </select>
+        <input [(ngModel)]="editingReservation.salleNum" name="edit-salle-num" type="number" min="1" placeholder="Salle Num" required />
+        <select [(ngModel)]="editingReservation.status" name="edit-status">
+          <option value="EMPTY">EMPTY</option>
+          <option value="PENDING">PENDING</option>
+          <option value="CONFIRMED">CONFIRMED</option>
+          <option value="CANCELLED">CANCELLED</option>
+        </select>
+        <div class="form-actions-inline">
+          <button type="submit" class="primary-btn">Enregistrer</button>
+          <button type="button" class="ghost-btn" (click)="cancelEdit()">Annuler</button>
+        </div>
+        <p class="error" *ngIf="editError">{{ editError }}</p>
+      </form>
+    </article>
+
+    <article class="card" *ngIf="showCreateForm">
+      <h3>New Salle</h3>
+      
+      <form class="create-form" (submit)="$event.preventDefault(); createReservation();">
+        <input [(ngModel)]="newReservation.salleNum" name="salle-num" type="number" min="1" placeholder="Salle Num" required style="grid-column: span 2;" />
+        <p class="error" *ngIf="createError" style="grid-column: span 2; margin-top: 0;">{{ createError }}</p>
+        <button type="submit" class="primary-btn" style="grid-column: span 2;">Créer</button>
+      </form>
+    </article>
+
+    <article class="card">
+      <div class="table-header">
+        <h3>Liste des réservations</h3>
+        <button type="button" class="ghost-btn" (click)="fetchReservations()">Rafraichir</button>
+      </div>
+
+      <form class="search-row" (submit)="$event.preventDefault(); fetchReservations();">
+        <input
+          [(ngModel)]="searchQuery"
+          name="reservation-search"
+          type="search"
+          placeholder="Rechercher…"
+          autocomplete="off"
+        />
+        <button type="submit" class="primary-btn">Rechercher</button>
+        <button type="button" class="ghost-btn" (click)="clearSearch()">Réinitialiser</button>
+      </form>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p *ngIf="loading">Chargement...</p>
+
+      <table *ngIf="!loading">
+        <thead>
+          <tr>
+            <th>Utilisateur</th>
+            <th>Salle Num</th>
+            <th>Date de réservation</th>
+            <th>Statut</th>
+            
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let reservation of reservations">
+            <td>{{ getUserFullName(reservation.userId) }}</td>
+            <td>{{ reservation.salleNum }}</td>
+            <td>{{ reservation.reservationDate | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>
+              <span [ngClass]="'status-badge ' + getStatusClass(reservation.status)">
+                {{ reservation.status }}
+              </span>
+            </td>
+            
+            <td class="col-actions">
+              <div class="row-actions">
+                <button *ngIf="reservation.status === 'EMPTY'" type="button" class="primary-btn btn-sm" (click)="reserveRoom(reservation)">Réserver</button>
+                <button type="button" class="ghost-btn btn-sm" (click)="startEdit(reservation)">Modifier</button>
+                <button type="button" class="danger-btn btn-sm" (click)="deleteReservation(reservation)">Supprimer</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="muted" *ngIf="!loading && reservations.length === 0">Aucune réservation trouvée.</p>
+    </article>
+
+    <app-footer [text]="'© 2026 Réservations Administration'"></app-footer>
+  </section>
+</div>

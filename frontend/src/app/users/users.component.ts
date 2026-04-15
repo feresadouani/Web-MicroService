@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 import { SidebarItem } from '../layout/sidebar/sidebar.component';
+import { ADMIN_SIDEBAR_ITEMS } from '../layout/sidebar/admin-sidebar-items';
 import { UserApiService, CreateUserPayload, UserDto } from '../services/user-api.service';
 
 @Component({
@@ -11,13 +12,7 @@ import { UserApiService, CreateUserPayload, UserDto } from '../services/user-api
 })
 export class UsersComponent implements OnInit, OnDestroy {
   private static readonly STRONG_PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).+$/;
-  menuItems: SidebarItem[] = [
-    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
-    { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Cours', route: ['/admin', 'cours'] },
-    { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Add Event', route: ['/admin', 'events', 'add'] }
-  ];
+  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
 
   users: UserDto[] = [];
   loading = false;

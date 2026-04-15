@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SidebarItem } from '../layout/sidebar/sidebar.component';
+import { ADMIN_SIDEBAR_ITEMS } from '../layout/sidebar/admin-sidebar-items';
 import { UserApiService } from '../services/user-api.service';
 
 @Component({
@@ -12,13 +13,7 @@ export class AdminDashboardComponent implements OnInit {
   userMiniStatLoading = true;
   userMiniStatError = false;
 
-  menuItems: SidebarItem[] = [
-    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
-    { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Cours', route: ['/admin', 'cours'] },
-    { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Add Event', route: ['/admin', 'events', 'add'] }
-  ];
+  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
 
   kpis: { title: string; value: string; trend: string; icon: 'building' | 'chart' | 'money' }[] = [
     { title: 'Companies', value: '456', trend: '+8% from last month', icon: 'building' },

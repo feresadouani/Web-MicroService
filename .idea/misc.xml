@@ -7,10 +7,11 @@
         <option value="$PROJECT_DIR$/eureka/pom.xml" />
         <option value="$PROJECT_DIR$/gateway/pom.xml" />
         <option value="$PROJECT_DIR$/Config/pom.xml" />
-        <option value="$PROJECT_DIR$/event/pom.xml" />
-        <option value="$PROJECT_DIR$/events/pom.xml" />
+        <option value="$PROJECT_DIR$/Reservation/pom.xml" />
         <option value="$PROJECT_DIR$/user/pom.xml" />
         <option value="$PROJECT_DIR$/cours/pom.xml" />
+        <option value="$PROJECT_DIR$/events/pom.xml" />
+        <option value="$PROJECT_DIR$/clubs/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

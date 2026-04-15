@@ -14,4 +14,9 @@ export class UpdateReclamationDto {
   @IsString()
   @MaxLength(32)
   status?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  reply?: string;
 }

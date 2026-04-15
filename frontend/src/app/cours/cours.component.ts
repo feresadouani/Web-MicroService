@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SidebarItem } from '../layout/sidebar/sidebar.component';
+import { ADMIN_SIDEBAR_ITEMS } from '../layout/sidebar/admin-sidebar-items';
 import {
   CoursApiService,
   CoursDto,
@@ -14,11 +15,7 @@ import { UserApiService, UserDto } from '../services/user-api.service';
   styleUrl: './cours.component.css'
 })
 export class CoursComponent implements OnInit {
-  menuItems: SidebarItem[] = [
-    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
-    { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Cours', route: ['/admin', 'cours'] }
-  ];
+  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
 
   coursList: CoursDto[] = [];
   loading = false;
