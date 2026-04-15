@@ -20,7 +20,10 @@ public class GatewayApplication {
                 .route("users",
                         r -> r.path("/users/**")
                                 .uri("lb://user-service"))
-                .route("events", r -> r.path("/events/**")
+                .route("events", r -> r.path("/events/**", "/api/events", "/api/events/**")
+                        .filters(f -> f
+                                .rewritePath("/api/events$", "/events")
+                                .rewritePath("/api/events/(?<segment>.*)", "/events/${segment}"))
                         .uri("lb://events"))
                 .route("reclamations", r -> r.path("/reclamations/**")
                         .uri("lb://reclamation-service"))
