@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { UsersComponent } from './users/users.component';
+import { ReservationsComponent } from './reservations/reservations.component';
 import { PostLoginRedirectComponent } from './post-login-redirect/post-login-redirect.component';
 import { UserPortalComponent } from './user-portal/user-portal.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
@@ -28,7 +29,8 @@ const routes: Routes = [
       { path: 'users', component: UsersComponent },
       { path: 'cours', component: CoursComponent },
       { path: 'events', component: AdminEventsComponent },
-      { path: 'events/add', component: AddEventComponent }
+      { path: 'events/add', component: AddEventComponent },
+      { path: 'reservations', component: ReservationsComponent }
     ]
   },
   { path: '**', redirectTo: '' }

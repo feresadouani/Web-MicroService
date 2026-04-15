@@ -84,7 +84,7 @@ function idFromSelfHref(href: string | undefined): number | undefined {
   providedIn: 'root'
 })
 export class UserApiService {
-  private readonly gatewayBaseUrl = 'http://localhost:8081';
+  private readonly gatewayBaseUrl = 'http://localhost:8087';
 
   constructor(private readonly http: HttpClient) {}
 

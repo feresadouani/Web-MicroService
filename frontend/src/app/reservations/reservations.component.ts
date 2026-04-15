@@ -1,0 +1,198 @@
+import { Component, OnInit } from '@angular/core';
+import { SidebarItem } from '../layout/sidebar/sidebar.component';
+import { ReservationApiService, ReservationDto, CreateReservationPayload } from '../services/reservation-api.service';
+import { UserApiService, UserDto } from '../services/user-api.service';
+
+@Component({
+  selector: 'app-reservations',
+  templateUrl: './reservations.component.html',
+  styleUrl: './reservations.component.css'
+})
+export class ReservationsComponent implements OnInit {
+  menuItems: SidebarItem[] = [
+    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
+    { label: 'Users', route: ['/admin', 'users'] },
+    { label: 'Reservations', route: ['/admin', 'reservations'] }
+  ];
+
+  reservations: ReservationDto[] = [];
+  users: UserDto[] = [];
+  loading = false;
+  showCreateForm = false;
+  error = '';
+  searchQuery = '';
+
+  newReservation: CreateReservationPayload = {
+    userId: 0,
+    salleNum: 0,
+    reservationDate: '',
+    status: 'PENDING',
+    notes: ''
+  };
+
+  editingReservation: ReservationDto | null = null;
+
+  constructor(
+    private readonly reservationApiService: ReservationApiService,
+    private readonly userApiService: UserApiService
+  ) {}
+
+  ngOnInit(): void {
+    this.fetchReservations();
+    this.fetchUsers();
+  }
+
+  fetchUsers(): void {
+    this.userApiService.getUsers().subscribe({
+      next: (users) => {
+        this.users = users;
+      },
+      error: (err) => {
+        console.error('Erreur chargement users:', err);
+      }
+    });
+  }
+
+  fetchReservations(): void {
+    this.loading = true;
+    this.error = '';
+    this.reservationApiService.getReservations(this.searchQuery).subscribe({
+      next: (reservations) => {
+        this.reservations = reservations;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = `Erreur chargement réservations: ${err.status} ${err.statusText}`;
+        this.loading = false;
+      }
+    });
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.fetchReservations();
+  }
+
+  toggleCreateForm(): void {
+    this.showCreateForm = !this.showCreateForm;
+  }
+
+  createReservation(): void {
+    this.error = '';
+    if (!this.newReservation.userId || !this.newReservation.salleNum) {
+      this.error = 'userId et salleNum sont obligatoires';
+      return;
+    }
+
+    const now = new Date();
+    // Ajuster pour avoir l'heure locale exacte dans la chaîne ISO
+    const localDateTime = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
+                            .toISOString()
+                            .slice(0, 19); // "YYYY-MM-DDTHH:mm:ss"
+
+    const payload: CreateReservationPayload = {
+      ...this.newReservation,
+      status: 'PENDING',
+      reservationDate: localDateTime
+    };
+
+    this.reservationApiService.createReservation(payload).subscribe({
+      next: () => {
+        this.showCreateForm = false;
+        this.newReservation = {
+          userId: 0,
+          salleNum: 0,
+          reservationDate: '',
+          status: 'PENDING',
+          notes: ''
+        };
+        this.fetchReservations();
+      },
+      error: (err) => {
+        console.error("Full error object: ", err);
+        const serverMsg = typeof err.error === 'string' ? err.error : err.message;
+        this.error = `Erreur création réservation: ${err.status} ${err.statusText} - ${serverMsg}`;
+      }
+    });
+  }
+
+  startEdit(reservation: ReservationDto): void {
+    this.error = '';
+    if (reservation.id == null) {
+      this.error = 'Impossible de modifier : identifiant manquant.';
+      return;
+    }
+    this.showCreateForm = false;
+    this.editingReservation = { ...reservation };
+  }
+
+  cancelEdit(): void {
+    this.editingReservation = null;
+  }
+
+  saveEdit(): void {
+    const r = this.editingReservation;
+    if (r == null || r.id == null) {
+      return;
+    }
+    const id = r.id;
+    this.error = '';
+
+    const updatePayload = {
+      userId: r.userId,
+      salleNum: r.salleNum,
+      reservationDate: r.reservationDate,
+      status: r.status,
+      notes: r.notes
+    };
+
+    this.reservationApiService.updateReservation(id, updatePayload).subscribe({
+      next: () => {
+        this.editingReservation = null;
+        this.fetchReservations();
+      },
+      error: (err) => {
+        this.error = `Erreur mise à jour réservation: ${err.status} ${err.statusText}`;
+      }
+    });
+  }
+
+  deleteReservation(reservation: ReservationDto): void {
+    if (reservation.id == null) {
+      this.error = 'Impossible de supprimer : identifiant manquant.';
+      return;
+    }
+    if (!confirm(`Supprimer la réservation pour la salle ${reservation.salleNum} ?`)) {
+      return;
+    }
+    this.error = '';
+    this.reservationApiService.deleteReservation(reservation.id).subscribe({
+      next: () => {
+        if (this.editingReservation?.id === reservation.id) {
+          this.editingReservation = null;
+        }
+        this.fetchReservations();
+      },
+      error: (err) => {
+        this.error = `Erreur suppression réservation: ${err.status} ${err.statusText}`;
+      }
+    });
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'CONFIRMED':
+        return 'status-confirmed';
+      case 'CANCELLED':
+        return 'status-cancelled';
+      default:
+        return 'status-pending';
+    }
+  }
+
+  getUserFullName(userId: number | undefined): string {
+    if (!userId) return '-';
+    const user = this.users.find(u => u.id === userId);
+    return user ? `${user.firstname} ${user.lastname}` : `Inconnu (${userId})`;
+  }
+}
