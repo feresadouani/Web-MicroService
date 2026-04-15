@@ -40,6 +40,7 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-top: 10px;
+  align-items: start;
 }
 
 .create-form input,
@@ -47,6 +48,19 @@
   border: 1px solid #dbe2ea;
   border-radius: 8px;
   padding: 9px 10px;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.field-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-stack input {
+  width: 100%;
 }
 
 .table-header {
@@ -102,6 +116,7 @@ th {
 .primary-btn {
   background: #16a34a;
   color: #fff;
+  min-height: 40px;
 }
 
 .ghost-btn {
@@ -111,6 +126,13 @@ th {
 
 .error {
   color: #b91c1c;
+}
+
+.field-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 12px;
+  line-height: 1.2;
 }
 
 .col-actions {
@@ -148,6 +170,12 @@ th {
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+.create-form > .primary-btn,
+.create-form > .ghost-btn,
+.create-form > .danger-btn {
+  align-self: start;
 }
 
 @media (max-width: 1000px) {

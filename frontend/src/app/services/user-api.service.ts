@@ -29,6 +29,7 @@ export interface CreateUserPayload {
   email: string;
   password: string;
   role: 'USER' | 'ADMIN';
+  birthday?: string;
 }
 
 export interface UpdateUserPayload {
@@ -82,13 +83,16 @@ export class UserApiService {
   }
 
   createUser(payload: CreateUserPayload): Observable<UserDto> {
-    const body = {
+    const body: Record<string, string> = {
       firstname: payload.firstname,
       lastname: payload.lastname,
       email: payload.email,
       password: payload.password,
       role: payload.role
     };
+    if (payload.birthday != null && payload.birthday.length > 0) {
+      body['birthday'] = payload.birthday;
+    }
     return this.http.post<UserDto>(`${this.gatewayBaseUrl}/users`, body);
   }
 

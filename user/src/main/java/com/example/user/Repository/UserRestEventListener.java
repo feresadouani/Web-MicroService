@@ -3,6 +3,7 @@ package com.example.user.Repository;
 import com.example.user.Entity.User;
 import com.example.user.keycloak.KeycloakAdminService;
 import org.springframework.data.rest.core.event.AbstractRepositoryEventListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -13,16 +14,24 @@ public class UserRestEventListener extends AbstractRepositoryEventListener<User>
 
     private final KeycloakAdminService keycloakAdminService;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final Map<Long, String> oldEmailByUserId = new ConcurrentHashMap<>();
 
-    public UserRestEventListener(KeycloakAdminService keycloakAdminService, UserRepository userRepository) {
+    public UserRestEventListener(
+            KeycloakAdminService keycloakAdminService,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         this.keycloakAdminService = keycloakAdminService;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     protected void onBeforeCreate(User user) {
         keycloakAdminService.stashPlainPasswordForNewUser(user.getEmail(), user.getPassword());
+        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
     }
 
     @Override

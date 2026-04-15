@@ -1,6 +1,7 @@
 package com.example.clubs.controller;
 
 import com.example.clubs.entity.Club;
+import com.example.clubs.entity.Member;
 import com.example.clubs.service.ClubService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,32 @@ public class ClubController {
         return clubService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{clubId}/members")
+    public ResponseEntity<List<Member>> getMembersByClubId(@PathVariable Long clubId) {
+        if (!clubService.findById(clubId).isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(clubService.findMembersByClubId(clubId));
+    }
+
+    @PostMapping("/{clubId}/members")
+    public ResponseEntity<Member> addMemberToClub(@PathVariable Long clubId, @RequestBody Member member) {
+        if (!clubService.findById(clubId).isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        Member savedMember = clubService.addMemberToClub(clubId, member);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedMember);
+    }
+
+    @DeleteMapping("/{clubId}/members/{memberId}")
+    public ResponseEntity<Void> removeMemberFromClub(@PathVariable Long clubId, @PathVariable Long memberId) {
+        if (!clubService.findById(clubId).isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        clubService.removeMemberFromClub(clubId, memberId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping

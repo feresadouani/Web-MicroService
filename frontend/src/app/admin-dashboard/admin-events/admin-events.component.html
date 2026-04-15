@@ -1,0 +1,100 @@
+<div class="events-layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems">
+  </app-sidebar>
+
+  <section class="events-content">
+    <app-navbar></app-navbar>
+
+    <section class="header-row">
+      <h1>Events Management</h1>
+      <div class="header-actions">
+        <a routerLink="/admin/events/add" class="primary-btn">Add event</a>
+        <button type="button" class="ghost-btn" (click)="fetchEvents()">Refresh</button>
+      </div>
+    </section>
+
+    <article class="card" *ngIf="editingEvent">
+      <h3>Edit event</h3>
+      <form class="edit-form" (submit)="$event.preventDefault(); saveEdit();">
+        <input [(ngModel)]="editingEvent.name" name="edit-name" placeholder="Name" required />
+        <input [(ngModel)]="editingEvent.location" name="edit-location" placeholder="Location" required />
+        <input [(ngModel)]="editingEvent.date" name="edit-date" type="date" required />
+        <textarea [(ngModel)]="editingEvent.description" name="edit-description" rows="4" placeholder="Description" required></textarea>
+        <div class="form-actions-inline">
+          <button type="submit" class="primary-btn">Save</button>
+          <button type="button" class="ghost-btn" (click)="cancelEdit()">Cancel</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="card">
+      <h3>Event list</h3>
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p *ngIf="loading">Loading...</p>
+
+      <table *ngIf="!loading">
+        <thead>
+          <tr>
+            <th style="width: 30px;"></th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Location</th>
+            <th>Date</th>
+            <th style="width: 80px; text-align: center;">Subscribers</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let event of events">
+            <!-- Main event row -->
+            <tr>
+              <td style="text-align: center; cursor: pointer;" (click)="toggleSubscribers(event.id)">
+                <span [style.transform]="expandedEventId === event.id ? 'rotate(90deg)' : 'rotate(0deg)'" style="display: inline-block; transition: transform 0.2s; font-size: 12px;">▶</span>
+              </td>
+              <td><strong>{{ event.name }}</strong></td>
+              <td class="td-desc">{{ event.description }}</td>
+              <td>{{ event.location }}</td>
+              <td>{{ event.date | date:'mediumDate' }}</td>
+              <td style="text-align: center; font-weight: bold;">{{ getSubscriberCount(event) }}</td>
+              <td class="col-actions">
+                <div class="row-actions">
+                  <button type="button" class="ghost-btn btn-sm" (click)="startEdit(event)">Edit</button>
+                  <button type="button" class="danger-btn btn-sm" (click)="deleteEvent(event)">Delete</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Subscribers detail row (expandable) -->
+            <tr *ngIf="expandedEventId === event.id" class="detail-row">
+              <td colspan="7">
+                <div class="subscribers-container">
+                  <h4>Subscribers ({{ getSubscriberCount(event) }})</h4>
+                  <div *ngIf="getSubscriberCount(event) === 0" class="no-subscribers">
+                    <p>No subscribers yet</p>
+                  </div>
+                  <table class="subscribers-table" *ngIf="getSubscriberCount(event) > 0">
+                    <thead>
+                      <tr>
+                        <th>First name</th>
+                        <th>Email</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let subscriber of getSubscribersList(event)">
+                        <td>{{ subscriber.firstName || '-' }}</td>
+                        <td>{{ subscriber.email || '-' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+
+          </ng-container>
+        </tbody>
+      </table>
+    </article>
+
+    <app-footer [text]="'© 2026 Events Administration'"></app-footer>
+  </section>
+</div>
