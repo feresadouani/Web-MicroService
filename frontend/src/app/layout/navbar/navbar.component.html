@@ -6,6 +6,8 @@
   </div>
 
   <div class="right">
+    <a *ngIf="!isAdmin" routerLink="/reclamations/add" class="action-link primary">Add reclamation</a>
+    <a *ngIf="!isAdmin" routerLink="/reclamations" class="action-link">Mes réclamations</a>
     <button class="account-button" type="button" (click)="toggleAccountDropdown($event)">
       <img
         class="avatar"

@@ -16,7 +16,7 @@ export class AdminDashboardComponent implements OnInit {
     { label: 'Dashboard', route: ['/admin', 'dashboard'] },
     { label: 'Users', route: ['/admin', 'users'] },
     { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Add Event', route: ['/admin', 'events', 'add'] }
+    { label: 'Reclamations', route: ['/admin', 'reclamations'] },
   ];
 
   kpis: { title: string; value: string; trend: string; icon: 'building' | 'chart' | 'money' }[] = [

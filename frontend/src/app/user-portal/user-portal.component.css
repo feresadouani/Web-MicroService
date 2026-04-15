@@ -145,6 +145,31 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
+.cta-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cta-secondary {
+  display: inline-block;
+  padding: 14px 28px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.cta-secondary:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.18);
+}
+
 .cta-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
@@ -328,6 +353,10 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .subscribe-btn:hover:not(:disabled) {
@@ -477,6 +506,22 @@
 .submit-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(76, 126, 243, 0.3);
+}
+
+.cta-help {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.cta-help .cta-secondary {
+  background: linear-gradient(135deg, #4c7ef3, #7b5cff);
+  border: none;
+}
+
+.cta-help .cta-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(76, 126, 243, 0.25);
 }
 
 /* ═══════════════════════════════════════════════════════════════ */

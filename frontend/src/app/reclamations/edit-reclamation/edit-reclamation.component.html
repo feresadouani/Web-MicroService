@@ -1,0 +1,53 @@
+<section class="page">
+  <app-navbar></app-navbar>
+
+  <article class="card">
+    <header class="card-head">
+      <h1>Modifier réclamation</h1>
+      <p class="muted" *ngIf="row">Statut: <strong>{{ row.status }}</strong></p>
+    </header>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <p class="success" *ngIf="success">{{ success }}</p>
+    <p *ngIf="loading">Loading...</p>
+
+    <div class="reply-box" *ngIf="row?.reply">
+      <strong>Réponse admin</strong>
+      <p class="reply-text">{{ row?.reply }}</p>
+      <small class="muted" *ngIf="row?.repliedAt">{{ row?.repliedAt | date:'medium' }}</small>
+    </div>
+
+    <form class="form" *ngIf="!loading" (submit)="$event.preventDefault(); save();">
+      <label class="field">
+        <span>Title</span>
+        <input
+          type="text"
+          name="title"
+          [(ngModel)]="title"
+          maxlength="200"
+          required
+        />
+      </label>
+
+      <label class="field">
+        <span>Description</span>
+        <textarea
+          name="description"
+          [(ngModel)]="description"
+          rows="6"
+          required
+        ></textarea>
+      </label>
+
+      <div class="actions">
+        <button class="primary" type="submit" [disabled]="saving">
+          {{ saving ? 'Saving...' : 'Save' }}
+        </button>
+        <a class="ghost" routerLink="/reclamations">Cancel</a>
+      </div>
+    </form>
+  </article>
+
+  <app-footer [text]="'© 2026 Reclamations'"></app-footer>
+</section>
+

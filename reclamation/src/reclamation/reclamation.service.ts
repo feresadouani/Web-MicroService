@@ -92,6 +92,17 @@ export class ReclamationService {
     isAdmin: boolean,
   ): Promise<ReclamationDocument> {
     const row = await this.findOne(id, user, isAdmin);
+
+    if (!isAdmin) {
+      // Users can only modify their own reclamation (title/description).
+      if (dto.status != null) {
+        throw new ForbiddenException();
+      }
+      if (dto.reply != null) {
+        throw new ForbiddenException();
+      }
+    }
+
     if (dto.title != null) {
       row.title = dto.title.trim();
     }
@@ -104,6 +115,10 @@ export class ReclamationService {
         throw new ForbiddenException('Statut invalide');
       }
       row.status = s;
+    }
+    if (dto.reply != null) {
+      row.reply = dto.reply.trim();
+      row.repliedAt = new Date();
     }
     await row.save();
     return row;

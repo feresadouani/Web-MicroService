@@ -52,13 +52,17 @@ export class ReclamationController {
   }
 
   @Patch(':id')
-  @Roles('CLIENT_ADMIN')
   update(
     @Param('id') id: string,
     @Body() dto: UpdateReclamationDto,
     @Req() req: Request & { user: JwtUser },
   ) {
-    return this.reclamationService.update(id, dto, req.user, true);
+    return this.reclamationService.update(
+      id,
+      dto,
+      req.user,
+      this.isAdmin(req.user),
+    );
   }
 
   @Delete(':id')
