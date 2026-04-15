@@ -13,35 +13,21 @@ export class UserPortalComponent implements OnInit {
   events: Event[] = [];
   eventsLoading = true;
   eventsError = false;
-
-  /** Tracks which event IDs have their subscriber list open */
-  expandedEventIds = new Set<number>();
-
-  /** Tracks which event IDs are currently toggling (spinner) */
-  pendingEventIds = new Set<number>();
-
-  /** Current user's Keycloak subject (unique ID) */
-  private get currentUserId(): string {
-    return (keycloakService.profile?.['sub'] as string) ?? '';
-  }
-
-  /** Current user's display name from token */
-  private get currentDisplayName(): string {
-    const p = keycloakService.profile as Record<string, unknown> | undefined;
-    if (!p) return 'Utilisateur';
-    const first = (p['given_name'] as string) ?? '';
-    const last  = (p['family_name'] as string) ?? '';
-    if (first || last) return `${first} ${last}`.trim();
-    return (p['preferred_username'] as string) ?? (p['email'] as string) ?? 'Utilisateur';
-  }
+  loadingSubscriptions = new Set<number>();
+  subscriptionError: string | null = null;
 
   constructor(private readonly eventService: EventService) {}
 
   ngOnInit(): void {
+    this.loadEvents();
+  }
+
+  loadEvents(): void {
     this.eventService.getAllEvents().subscribe({
       next: (events) => {
         this.events = events;
         this.eventsLoading = false;
+        this.loadSubscriptionStatus();
       },
       error: () => {
         this.eventsError = true;
@@ -50,59 +36,87 @@ export class UserPortalComponent implements OnInit {
     });
   }
 
-  /** Returns true if the current user is registered to this event */
-  isRegistered(event: Event): boolean {
-    if (!event.registeredUsers || !this.currentUserId) return false;
-    return this.currentUserId in event.registeredUsers;
+  /**
+   * Load subscription status for all events
+   */
+  loadSubscriptionStatus(): void {
+    this.events.forEach(event => {
+      if (event.id) {
+        this.eventService.isSubscribed(event.id).subscribe({
+          next: (response) => {
+            event.isSubscribed = response.isSubscribed;
+          },
+          error: (err) => {
+            console.log('Not authenticated or error checking subscription', err);
+            event.isSubscribed = false;
+          }
+        });
+      }
+    });
   }
 
-  /** Returns the list of subscriber display names for an event */
-  getSubscriberNames(event: Event): string[] {
-    if (!event.registeredUsers) return [];
-    return Object.values(event.registeredUsers);
-  }
-
-  /** Returns count of subscribers */
-  getSubscriberCount(event: Event): number {
-    return Object.keys(event.registeredUsers ?? {}).length;
-  }
-
-  /** Toggle show/hide subscriber list */
-  toggleSubscriberList(event: Event): void {
+  /**
+   * Toggle subscription (subscribe or unsubscribe)
+   */
+  toggleSubscription(event: Event): void {
     if (!event.id) return;
-    if (this.expandedEventIds.has(event.id)) {
-      this.expandedEventIds.delete(event.id);
+
+    if (event.isSubscribed) {
+      this.unsubscribeFromEvent(event);
     } else {
-      this.expandedEventIds.add(event.id);
+      this.subscribeToEvent(event);
     }
   }
 
-  isExpanded(event: Event): boolean {
-    return !!event.id && this.expandedEventIds.has(event.id);
-  }
-
-  /** Toggle registration (subscribe / unsubscribe) */
-  toggleRegistration(event: Event): void {
+  /**
+   * Subscribe to an event
+   */
+  subscribeToEvent(event: Event): void {
     if (!event.id) return;
-    const userId = this.currentUserId;
-    if (!userId) return;
 
-    this.pendingEventIds.add(event.id);
+    this.loadingSubscriptions.add(event.id);
+    this.subscriptionError = null;
 
-    const action$ = this.isRegistered(event)
-      ? this.eventService.unregisterFromEvent(event.id, userId)
-      : this.eventService.registerToEvent(event.id, userId, this.currentDisplayName);
-
-    action$.subscribe({
-      next: (updatedEvent) => {
-        const idx = this.events.findIndex(e => e.id === updatedEvent.id);
-        if (idx !== -1) this.events[idx] = updatedEvent;
-        this.pendingEventIds.delete(event.id!);
+    this.eventService.subscribeToEvent(event.id).subscribe({
+      next: () => {
+        event.isSubscribed = true;
+        this.loadingSubscriptions.delete(event.id!);
       },
-      error: () => {
-        this.pendingEventIds.delete(event.id!);
+      error: (err) => {
+        console.error('Subscription error:', err);
+        this.subscriptionError = err.error?.error || 'Failed to subscribe to event';
+        this.loadingSubscriptions.delete(event.id!);
       }
     });
+  }
+
+  /**
+   * Unsubscribe from an event
+   */
+  unsubscribeFromEvent(event: Event): void {
+    if (!event.id) return;
+
+    this.loadingSubscriptions.add(event.id);
+    this.subscriptionError = null;
+
+    this.eventService.unsubscribeFromEvent(event.id).subscribe({
+      next: () => {
+        event.isSubscribed = false;
+        this.loadingSubscriptions.delete(event.id!);
+      },
+      error: (err) => {
+        console.error('Unsubscription error:', err);
+        this.subscriptionError = err.error?.error || 'Failed to unsubscribe from event';
+        this.loadingSubscriptions.delete(event.id!);
+      }
+    });
+  }
+
+  /**
+   * Check if loading for a specific event
+   */
+  isLoading(eventId: number | undefined): boolean {
+    return eventId ? this.loadingSubscriptions.has(eventId) : false;
   }
 
   logout(): void {

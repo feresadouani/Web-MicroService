@@ -78,6 +78,19 @@ th {
   font-weight: 600;
 }
 
+.col-center {
+  text-align: center;
+}
+
+.td-desc {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Action buttons ──────────────────────────────────────────── */
+
 .primary-btn,
 .ghost-btn,
 .danger-btn {
@@ -140,5 +153,13 @@ th {
 
   .edit-form textarea {
     grid-column: auto;
+  }
+
+  .subs-grid {
+    flex-direction: column;
+  }
+
+  .sub-uid {
+    max-width: 160px;
   }
 }

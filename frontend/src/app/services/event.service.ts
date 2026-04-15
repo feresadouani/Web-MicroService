@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Event } from '../models/event.model';
 
@@ -7,7 +7,7 @@ import { Event } from '../models/event.model';
   providedIn: 'root'
 })
 export class EventService {
-  private readonly API_URL = 'http://localhost:8081/events';
+  private readonly API_URL = 'http://localhost:8081/api/events';
 
   constructor(private httpClient: HttpClient) {}
 
@@ -27,17 +27,35 @@ export class EventService {
     return this.httpClient.delete<void>(`${this.API_URL}/${id}`);
   }
 
-  /** Subscribe a user to an event, sending their display name */
-  registerToEvent(eventId: number, userId: string, displayName: string): Observable<Event> {
-    const params = new HttpParams()
-      .set('userId', userId)
-      .set('displayName', displayName);
-    return this.httpClient.post<Event>(`${this.API_URL}/${eventId}/register`, null, { params });
+  /**
+   * Subscribe the current user to an event
+   */
+  subscribeToEvent(eventId: number): Observable<any> {
+    return this.httpClient.post(`${this.API_URL}/${eventId}/subscribe`, {});
   }
 
-  /** Unsubscribe a user from an event */
-  unregisterFromEvent(eventId: number, userId: string): Observable<Event> {
-    const params = new HttpParams().set('userId', userId);
-    return this.httpClient.delete<Event>(`${this.API_URL}/${eventId}/register`, { params });
+  /**
+   * Unsubscribe the current user from an event
+   */
+  unsubscribeFromEvent(eventId: number): Observable<void> {
+    return this.httpClient.delete<void>(`${this.API_URL}/${eventId}/subscribe`);
+  }
+
+  /**
+   * Check if the current user is subscribed to an event
+   */
+  isSubscribed(eventId: number): Observable<{ isSubscribed: boolean }> {
+    return this.httpClient.get<{ isSubscribed: boolean }>(
+      `${this.API_URL}/${eventId}/is-subscribed`
+    );
+  }
+
+  /**
+   * Get the number of subscribers for an event
+   */
+  getSubscriberCount(eventId: number): Observable<{ subscriberCount: number }> {
+    return this.httpClient.get<{ subscriberCount: number }>(
+      `${this.API_URL}/${eventId}/subscriber-count`
+    );
   }
 }

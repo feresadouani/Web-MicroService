@@ -43,18 +43,23 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let event of events">
-            <td>{{ event.name }}</td>
-            <td>{{ event.description }}</td>
-            <td>{{ event.location }}</td>
-            <td>{{ event.date | date:'mediumDate' }}</td>
-            <td class="col-actions">
-              <div class="row-actions">
-                <button type="button" class="ghost-btn btn-sm" (click)="startEdit(event)">Edit</button>
-                <button type="button" class="danger-btn btn-sm" (click)="deleteEvent(event)">Delete</button>
-              </div>
-            </td>
-          </tr>
+          <ng-container *ngFor="let event of events">
+            <!-- Main event row -->
+            <tr>
+              <td><strong>{{ event.name }}</strong></td>
+              <td class="td-desc">{{ event.description }}</td>
+              <td>{{ event.location }}</td>
+              <td>{{ event.date | date:'mediumDate' }}</td>
+              <td class="col-actions">
+                <div class="row-actions">
+                  <button type="button" class="ghost-btn btn-sm" (click)="startEdit(event)">Edit</button>
+                  <button type="button" class="danger-btn btn-sm" (click)="deleteEvent(event)">Delete</button>
+                </div>
+              </td>
+            </tr>
+
+
+          </ng-container>
         </tbody>
       </table>
     </article>

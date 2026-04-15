@@ -1,119 +1,134 @@
 <div class="transit-page">
+
   <header class="topbar">
-    <div class="brand">Transit</div>
+    <div class="brand-section">
+      <div class="brand">🎯 Events Portal</div>
+      <p class="brand-subtitle">Discover and join exciting events</p>
+    </div>
     <nav class="nav">
-      <a href="#features">Features</a>
-      <a routerLink="/events">Events</a>
-      <a href="#contact">Contact</a>
+      <a href="#features" class="nav-link">About</a>
+      <a routerLink="/events" class="nav-link">Events</a>
+      <a href="#contact" class="nav-link">Contact</a>
       <button type="button" class="logout-btn" (click)="logout()">Log out</button>
     </nav>
   </header>
-
   <section class="hero">
-    <h1>Hi, this is your user space</h1>
-    <p>Modern user interface integrated from the Transit template style.</p>
-    <a class="cta" href="#features">Explore</a>
+    <div class="hero-content">
+      <h1>Welcome to Events</h1>
+      <p>Discover amazing events happening around you. Connect with like-minded people and create unforgettable memories.</p>
+      <a class="cta-primary" href="#events">View Events</a>
+    </div>
   </section>
 
   <section class="notice" *ngIf="!isClientUser">
-    Warning: no <strong>client_user</strong> role was found in your token. Check Keycloak client roles.
+    ⚠️ Warning: no <strong>client_user</strong> role was found in your token. Check Keycloak client roles.
   </section>
 
-  <section id="features" class="section section-light">
-    <h2>Consectetur adipisicing elit</h2>
-    <p>Lorem ipsum dolor sit amet, delectus consequatur, similique quia.</p>
-    <div class="cards">
-      <article class="card">
-        <h3>Cloud Access</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Enim quam consectetur.</p>
-      </article>
-      <article class="card">
-        <h3>Responsive Design</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium ullam consequatur.</p>
-      </article>
-      <article class="card">
-        <h3>Fast Experience</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque eaque eveniet.</p>
-      </article>
+  <section id="events" class="section section-events">
+    <div class="section-header">
+      <h2>Upcoming Events</h2>
+      <p>Browse all available events and find something that interests you</p>
     </div>
-  </section>
 
-  <section id="events" class="section section-accent">
-    <h2>Upcoming events</h2>
-    <p>Browse events and subscribe to those you'd like to attend.</p>
+    <!-- Loading State -->
+    <div class="state-container" *ngIf="eventsLoading">
+      <div class="spinner"></div>
+      <p class="state-text">Loading events...</p>
+    </div>
 
-    <p class="state-text" *ngIf="eventsLoading">Loading events...</p>
-    <p class="state-text error" *ngIf="eventsError">Unable to load events right now.</p>
-    <p class="state-text" *ngIf="!eventsLoading && !eventsError && events.length === 0">No events available yet.</p>
+    <!-- Error State -->
+    <div class="state-container error" *ngIf="eventsError">
+      <span class="state-icon">❌</span>
+      <p class="state-text">Unable to load events right now. Please try again later.</p>
+    </div>
 
-    <div class="cards" *ngIf="!eventsLoading && !eventsError && events.length > 0">
-      <article class="card event-card" *ngFor="let event of events">
+    <!-- Subscription Error -->
+    <div class="state-container error" *ngIf="subscriptionError">
+      <span class="state-icon">⚠️</span>
+      <p class="state-text">{{ subscriptionError }}</p>
+    </div>
 
-        <!-- ── Card header ── -->
+    <!-- Empty State -->
+    <div class="state-container" *ngIf="!eventsLoading && !eventsError && events.length === 0">
+      <span class="state-icon">📭</span>
+      <p class="state-text">No events available yet. Check back soon!</p>
+    </div>
+
+    <!-- Events Grid -->
+    <div class="events-grid" *ngIf="!eventsLoading && !eventsError && events.length > 0">
+      <article class="event-card" *ngFor="let event of events">
         <div class="event-card-header">
+          <div class="event-icon">📅</div>
           <h3>{{ event.name }}</h3>
-          <span class="badge-inscrit" *ngIf="isRegistered(event)">✓ Inscrit</span>
         </div>
-
-        <p>{{ event.description }}</p>
-        <p class="event-meta"><strong>📍 Location:</strong> {{ event.location }}</p>
-        <p class="event-meta"><strong>📅 Date:</strong> {{ event.date | date:'mediumDate' }}</p>
-
-        <!-- ── Subscriber count + toggle ── -->
-        <button
-          class="subscribers-toggle"
-          (click)="toggleSubscriberList(event)"
-          [class.open]="isExpanded(event)">
-          <span class="sub-icon">👥</span>
-          <span>{{ getSubscriberCount(event) }} inscrit{{ getSubscriberCount(event) !== 1 ? 's' : '' }}</span>
-          <span class="chevron">{{ isExpanded(event) ? '▲' : '▼' }}</span>
-        </button>
-
-        <!-- ── Collapsible subscriber list ── -->
-        <div class="subscribers-panel" *ngIf="isExpanded(event)">
-          <p class="no-subs" *ngIf="getSubscriberCount(event) === 0">
-            Aucun inscrit pour le moment.
-          </p>
-          <ul class="subscriber-list" *ngIf="getSubscriberCount(event) > 0">
-            <li *ngFor="let name of getSubscriberNames(event)" class="subscriber-item">
-              <span class="sub-avatar">{{ name.charAt(0).toUpperCase() }}</span>
-              <span class="sub-name">{{ name }}</span>
-            </li>
-          </ul>
+        <p class="event-description">{{ event.description }}</p>
+        <div class="event-meta-container">
+          <div class="event-meta-item">
+            <span class="meta-icon">📍</span>
+            <span>{{ event.location }}</span>
+          </div>
+          <div class="event-meta-item">
+            <span class="meta-icon">🕐</span>
+            <span>{{ event.date | date:'MMM dd, yyyy' }}</span>
+          </div>
         </div>
-
-        <!-- ── Action button ── -->
         <div class="event-card-footer">
-          <button
-            *ngIf="isRegistered(event)"
-            class="btn-unregister"
-            [disabled]="pendingEventIds.has(event.id!)"
-            (click)="toggleRegistration(event)">
-            <span *ngIf="!pendingEventIds.has(event.id!)">Se désinscrire</span>
-            <span *ngIf="pendingEventIds.has(event.id!)">...</span>
-          </button>
-          <button
-            *ngIf="!isRegistered(event)"
-            class="btn-register"
-            [disabled]="pendingEventIds.has(event.id!)"
-            (click)="toggleRegistration(event)">
-            <span *ngIf="!pendingEventIds.has(event.id!)">S'inscrire</span>
-            <span *ngIf="pendingEventIds.has(event.id!)">...</span>
+          <button 
+            class="subscribe-btn"
+            [class.subscribed]="event.isSubscribed"
+            [disabled]="isLoading(event.id)"
+            (click)="toggleSubscription(event)">
+            {{ isLoading(event.id) ? '⏳ Loading...' : (event.isSubscribed ? '✓ Subscribed' : 'Subscribe') }}
           </button>
         </div>
-
       </article>
     </div>
   </section>
 
-  <section id="contact" class="section section-dark">
-    <h2>Contact us</h2>
-    <p>Send us a message to learn more about events and updates.</p>
+  <section id="features" class="section section-features">
+    <div class="section-header">
+      <h2>Why Join Events?</h2>
+      <p>Here's what makes our events special</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🌐</span>
+        <h3>Diverse Events</h3>
+        <p>From tech conferences to social gatherings, find events that match your interests.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">👥</span>
+        <h3>Community</h3>
+        <p>Connect with like-minded people and expand your professional network.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3>Easy Management</h3>
+        <p>Simple registration process and easy event tracking from your dashboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section section-contact">
+    <div class="section-header">
+      <h2>Get in Touch</h2>
+      <p>Have questions? We'd love to hear from you</p>
+    </div>
     <form class="contact-form" (submit)="$event.preventDefault()">
-      <input type="text" placeholder="Name" />
-      <input type="email" placeholder="Email" />
-      <textarea rows="5" placeholder="Message"></textarea>
-      <button type="submit">Send message</button>
+      <div class="form-group">
+        <input type="text" placeholder="Your Name" required />
+      </div>
+      <div class="form-group">
+        <input type="email" placeholder="Your Email" required />
+      </div>
+      <div class="form-group">
+        <textarea rows="5" placeholder="Your Message" required></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Send Message</button>
     </form>
   </section>
+
+  <footer class="footer">
+    <p>&copy; 2026 Events Portal. All rights reserved.</p>
+  </footer>
 </div>

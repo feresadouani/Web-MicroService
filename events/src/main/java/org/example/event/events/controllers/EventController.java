@@ -5,6 +5,8 @@ import org.example.event.events.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping({"/api/events", "/events"})
+
 public class EventController {
 
     @Autowired

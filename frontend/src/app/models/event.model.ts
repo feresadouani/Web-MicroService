@@ -4,6 +4,5 @@ export interface Event {
   description: string;
   location: string;
   date: Date;
-  /** Maps Keycloak userId (sub) → display name */
-  registeredUsers?: { [userId: string]: string };
+  isSubscribed?: boolean;
 }
