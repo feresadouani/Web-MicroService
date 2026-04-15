@@ -17,6 +17,8 @@ import { AdminReclamationsComponent } from './admin-dashboard/admin-reclamations
 import { MyReclamationsComponent } from './reclamations/my-reclamations/my-reclamations.component';
 import { EditReclamationComponent } from './reclamations/edit-reclamation/edit-reclamation.component';
 import { AdminReclamationDetailComponent } from './admin-dashboard/admin-reclamation-detail/admin-reclamation-detail.component';
+import { CourseDetailsComponent } from './course-details/course-details.component';
+import { UserCoursesComponent } from './user-courses/user-courses.component';
 
 const routes: Routes = [
   {
@@ -30,6 +32,8 @@ const routes: Routes = [
   { path: 'reclamations/add', component: AddReclamationComponent },
   { path: 'reclamations/:id/edit', component: EditReclamationComponent },
   { path: 'portal/profile', component: UserProfileComponent },
+  { path: 'portal/courses', component: UserCoursesComponent },
+  { path: 'portal/cours/:id', component: CourseDetailsComponent },
   { path: 'events', component: UserPortalComponent },
   { path: 'reservations', component: UserReservationsComponent },
   {
@@ -42,7 +46,7 @@ const routes: Routes = [
       { path: 'cours', component: CoursComponent },
       { path: 'events', component: AdminEventsComponent },
       { path: 'events/add', component: AddEventComponent },
-      { path: 'reservations', component: ReservationsComponent }
+      { path: 'reservations', component: ReservationsComponent },
       { path: 'reclamations', component: AdminReclamationsComponent },
       { path: 'reclamations/:id', component: AdminReclamationDetailComponent },
       { path: 'events/add', component: AddEventComponent }

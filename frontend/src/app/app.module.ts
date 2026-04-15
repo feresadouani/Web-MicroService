@@ -19,6 +19,8 @@ import { CoursComponent } from './cours/cours.component';
 import { UserEventsComponent } from './user-events/user-events.component';
 import { AddEventComponent } from './admin-dashboard/add-event/add-event.component';
 import { AdminEventsComponent } from './admin-dashboard/admin-events/admin-events.component';
+import { CourseDetailsComponent } from './course-details/course-details.component';
+import { UserCoursesComponent } from './user-courses/user-courses.component';
 import { AddReclamationComponent } from './reclamations/add-reclamation/add-reclamation.component';
 import { AdminReclamationsComponent } from './admin-dashboard/admin-reclamations/admin-reclamations.component';
 import { MyReclamationsComponent } from './reclamations/my-reclamations/my-reclamations.component';
@@ -51,13 +53,16 @@ import { UserReservationsComponent } from './user-reservations/user-reservations
     FooterComponent,
     AddEventComponent,
     AdminEventsComponent,
-    UserReservationsComponent
+    UserReservationsComponent,
     AdminEventsComponent,
     AddReclamationComponent,
     AdminReclamationsComponent,
     MyReclamationsComponent,
     EditReclamationComponent,
-    AdminReclamationDetailComponent
+    AdminReclamationDetailComponent,
+    AdminEventsComponent,
+    CourseDetailsComponent,
+    UserCoursesComponent
   ],
   imports: [
     BrowserModule,
