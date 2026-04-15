@@ -1,4 +1,4 @@
-import { Component, OnInit, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CoursApiService, CoursDto } from '../services/cours-api.service';
 import { Event } from '../models/event.model';
 import { EventService } from '../services/event.service';
@@ -17,10 +17,11 @@ export class UserPortalComponent implements OnInit {
   loadingSubscriptions = new Set<number>();
   subscriptionError: string | null = null;
 
-  constructor(private readonly eventService: EventService) {}
+  constructor(private readonly eventService: EventService,private readonly coursApiService: CoursApiService) {}
 
   ngOnInit(): void {
     this.loadEvents();
+    this.loadCours();
   }
 
   loadEvents(): void {
@@ -125,11 +126,7 @@ export class UserPortalComponent implements OnInit {
   loading = false;
   error = '';
 
-  constructor(private readonly coursApiService: CoursApiService) {}
 
-  ngOnInit(): void {
-    this.loadCours();
-  }
 
   loadCours(): void {
     this.loading = true;
