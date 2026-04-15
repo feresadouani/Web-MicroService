@@ -16,12 +16,6 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 24px;
-  max-width: 980px;
-  margin: 0 auto;
-}
-
-.portal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -75,6 +69,11 @@
   background: rgba(76, 126, 243, 0.1);
 }
 
+.nav-link.active-link {
+  color: #4c7ef3;
+  background: rgba(76, 126, 243, 0.1);
+}
+
 .logout-btn {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #fff;
@@ -104,6 +103,10 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+}
+
+.hero-compact {
+  padding: 72px 24px;
 }
 
 .hero::before {
@@ -169,6 +172,10 @@
   font-weight: 700;
   font-size: 16px;
   transition: all 0.3s ease;
+}
+
+.hero-compact .cta-secondary {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .cta-secondary:hover {

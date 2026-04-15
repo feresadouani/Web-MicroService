@@ -1,4 +1,3 @@
-import { Component } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { Event } from '../models/event.model';
 import { EventService } from '../services/event.service';
@@ -9,7 +8,7 @@ import { keycloakService } from '../services/keycloak.service';
   templateUrl: './user-portal.component.html',
   styleUrl: './user-portal.component.css'
 })
-export class UserPortalComponent {
+export class UserPortalComponent implements OnInit {
   readonly isClientUser = keycloakService.isClientUser();
   readonly userEmail = keycloakService.getUserEmail();
   events: Event[] = [];

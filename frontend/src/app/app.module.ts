@@ -36,6 +36,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {ReservationsComponent} from './reservations/reservations.component';
 import { UserReservationsComponent } from './user-reservations/user-reservations.component';
+import { UserNavbarComponent } from './layout/user-navbar/user-navbar.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -62,7 +63,8 @@ import { UserReservationsComponent } from './user-reservations/user-reservations
     AdminReclamationDetailComponent,
     AdminEventsComponent,
     CourseDetailsComponent,
-    UserCoursesComponent
+    UserCoursesComponent,
+    UserNavbarComponent
   ],
   imports: [
     BrowserModule,

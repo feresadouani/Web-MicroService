@@ -4,6 +4,7 @@ import { EventService } from '../../services/event.service';
 import { Event } from '../../models/event.model';
 import { Router } from '@angular/router';
 import { SidebarItem } from '../../layout/sidebar/sidebar.component';
+import { ADMIN_SIDEBAR_ITEMS } from '../../layout/sidebar/admin-sidebar-items';
 
 @Component({
   selector: 'app-add-event',
@@ -11,12 +12,7 @@ import { SidebarItem } from '../../layout/sidebar/sidebar.component';
   styleUrls: ['./add-event.component.css']
 })
 export class AddEventComponent implements OnInit {
-  menuItems: SidebarItem[] = [
-    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
-    { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Reclamations', route: ['/admin', 'reclamations'] }
-  ];
+  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
 
   eventForm!: FormGroup;
   isLoading = false;

@@ -6,6 +6,7 @@ import {
   ReclamationStatus
 } from '../../services/reclamation.service';
 import { SidebarItem } from '../../layout/sidebar/sidebar.component';
+import { ADMIN_SIDEBAR_ITEMS } from '../../layout/sidebar/admin-sidebar-items';
 
 @Component({
   selector: 'app-admin-reclamation-detail',
@@ -13,12 +14,7 @@ import { SidebarItem } from '../../layout/sidebar/sidebar.component';
   styleUrl: './admin-reclamation-detail.component.css'
 })
 export class AdminReclamationDetailComponent implements OnInit {
-  menuItems: SidebarItem[] = [
-    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
-    { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Reclamations', route: ['/admin', 'reclamations'] },
-  ];
+  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
 
   id = '';
   row: Reclamation | null = null;

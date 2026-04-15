@@ -1,14 +1,15 @@
-.layout {
+.dashboard-layout {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 190px 1fr;
+  gap: 12px;
+  padding: 10px;
   min-height: 100vh;
 }
 
-.content {
-  padding: 18px;
+.dashboard-content {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .header-row {
@@ -20,6 +21,9 @@
 
 .header-row h1 {
   margin: 0;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .header-actions {
@@ -31,8 +35,8 @@
   background: #ffffff;
   border: 1px solid #ececec;
   border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  padding: 14px;
+  box-shadow: 0 1px 1px rgba(15, 23, 42, 0.03), 0 8px 24px rgba(15, 23, 42, 0.04);
 }
 
 .alert {
@@ -56,7 +60,7 @@
 
 .form {
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .grid {
@@ -67,6 +71,44 @@
 
 .full-width {
   width: 100%;
+}
+
+/* Improve Angular Material field appearance */
+:host ::ng-deep .form .mat-mdc-form-field-subscript-wrapper {
+  margin-top: 4px;
+}
+
+:host ::ng-deep .form .mdc-text-field {
+  border-radius: 10px !important;
+  border: 1px solid #dbe3ef;
+  background: #ffffff !important;
+}
+
+:host ::ng-deep .form .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background: #ffffff !important;
+}
+
+:host ::ng-deep .form .mdc-text-field--filled .mdc-line-ripple::before,
+:host ::ng-deep .form .mdc-text-field--filled .mdc-line-ripple::after {
+  border-bottom-width: 0 !important;
+}
+
+:host ::ng-deep .form .mat-mdc-form-field-focus-overlay {
+  background: transparent;
+}
+
+:host ::ng-deep .form .mat-mdc-form-field.mat-focused .mdc-text-field {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+:host ::ng-deep .form .mat-mdc-input-element,
+:host ::ng-deep .form textarea.mat-mdc-input-element {
+  color: #0f172a;
+}
+
+:host ::ng-deep .form .mat-mdc-form-field-error {
+  font-size: 12px;
 }
 
 .ghost-btn {
@@ -83,13 +125,19 @@
 }
 
 .primary-btn {
-  border: 1px solid rgba(22, 163, 74, 0.35);
-  background: rgba(22, 163, 74, 0.1);
-  color: #166534;
+  border: 1px solid rgba(79, 70, 229, 0.3);
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #ffffff;
   border-radius: 10px;
   padding: 10px 12px;
   cursor: pointer;
   font-weight: 700;
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.2);
+}
+
+.primary-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.28);
 }
 
 .primary-btn:disabled {
@@ -98,7 +146,7 @@
 }
 
 @media (max-width: 980px) {
-  .layout {
+  .dashboard-layout {
     grid-template-columns: 1fr;
   }
   .grid {

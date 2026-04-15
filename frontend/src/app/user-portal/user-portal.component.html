@@ -1,36 +1,15 @@
 <div class="transit-page">
-
-  <header class="topbar">
-    <div class="brand-section">
-      <div class="brand">📚 Education Portal</div>
-      <p class="brand-subtitle">Learn, practice, and track your progress</p>
-      <div class="brand">🎯 Learning & Events Portal</div>
-      <p class="brand-subtitle">Explore your assigned courses and upcoming events</p>
-    </div>
-    <nav class="nav">
-      <a href="#features" class="nav-link">About</a>
-      <a routerLink="/portal/courses" class="nav-link">My Courses</a>
-      <a routerLink="/events" class="nav-link">Events</a>
-      <a routerLink="/reservations" class="nav-link">Reservations</a>
-      <a routerLink="/portal/profile" class="nav-link">My Profile</a>
-      <a href="#contact" class="nav-link">Contact</a>
-      <a routerLink="/portal" class="nav-link">Home</a>
-      <a routerLink="/event" class="nav-link">Events</a>
-      <a routerLink="/reclamations" class="nav-link">Reclamations</a>
-      <button type="button" class="logout-btn" (click)="logout()">Log out</button>
-    </nav>
-  </header>
-  <section class="hero">
+  <app-user-navbar [active]="'home'"></app-user-navbar>
+  <section class="hero hero-compact">
     <div class="hero-content">
       <h1>Welcome to your learning space</h1>
-      <p>Explore courses, follow learning paths, and keep improving with quizzes and practice.</p>
+      <p>Manage your courses, reservations, events and profile from one place.</p>
       <div class="cta-row">
-        <a class="cta-primary" href="#courses">Browse Courses</a>
-        <a class="cta-secondary" routerLink="/event">Go to Events</a>
+        <a class="cta-primary" routerLink="/portal/courses">My Courses</a>
+        <a class="cta-secondary" routerLink="/event">Events</a>
+        <a class="cta-secondary" routerLink="/reservations">Reservations</a>
+        <a class="cta-secondary" routerLink="/portal/profile">My Profile</a>
       </div>
-      <h1>Welcome to Your Portal</h1>
-      <p>View your assigned courses, check your professor, and continue learning with one click.</p>
-      <a class="cta-primary" routerLink="/portal/courses">View My Courses</a>
     </div>
   </section>
 
@@ -38,7 +17,7 @@
     ⚠️ Warning: no <strong>client_user</strong> role was found in your token. Check Keycloak client roles.
   </section>
 
-  <section id="courses" class="section section-events">
+  <section class="section section-events">
     <div class="section-header">
       <h2>Featured Courses</h2>
       <p>Pick a topic and start learning today</p>
@@ -92,7 +71,7 @@
     </div>
   </section>
 
-  <section id="features" class="section section-features">
+  <section class="section section-features">
     <div class="section-header">
       <h2>Why learn here?</h2>
       <p>A simple education experience focused on progress</p>
@@ -116,7 +95,7 @@
     </div>
   </section>
 
-  <section id="contact" class="section section-contact">
+  <section class="section section-contact">
     <div class="section-header">
       <h2>Need help?</h2>
       <p>Send us a message or create a reclamation</p>

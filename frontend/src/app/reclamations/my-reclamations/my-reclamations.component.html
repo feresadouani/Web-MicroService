@@ -1,5 +1,6 @@
-<section class="page">
-  <app-navbar></app-navbar>
+<div class="transit-page">
+  <app-user-navbar [active]="'reclamations'"></app-user-navbar>
+  <section class="page">
 
   <section class="header-row">
     <h1>Mes réclamations</h1>
@@ -53,6 +54,7 @@
     </table>
   </article>
 
-  <app-footer [text]="'© 2026 Reclamations'"></app-footer>
-</section>
+    <app-footer [text]="'© 2026 Reclamations'"></app-footer>
+  </section>
+</div>
 

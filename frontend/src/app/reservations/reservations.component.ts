@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SidebarItem } from '../layout/sidebar/sidebar.component';
+import { ADMIN_SIDEBAR_ITEMS } from '../layout/sidebar/admin-sidebar-items';
 import { ReservationApiService, ReservationDto, CreateReservationPayload } from '../services/reservation-api.service';
 import { UserApiService, UserDto } from '../services/user-api.service';
 
@@ -9,11 +10,7 @@ import { UserApiService, UserDto } from '../services/user-api.service';
   styleUrl: './reservations.component.css'
 })
 export class ReservationsComponent implements OnInit {
-  menuItems: SidebarItem[] = [
-    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
-    { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Reservations', route: ['/admin', 'reservations'] }
-  ];
+  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
 
   reservations: ReservationDto[] = [];
   users: UserDto[] = [];

@@ -33,7 +33,7 @@ export interface UpdateReservationPayload {
   providedIn: 'root'
 })
 export class ReservationApiService {
-  private readonly gatewayBaseUrl = 'http://localhost:8087';
+  private readonly gatewayBaseUrl = 'http://localhost:8081';
 
   constructor(private readonly http: HttpClient) {}
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SidebarItem } from '../../layout/sidebar/sidebar.component';
+import { ADMIN_SIDEBAR_ITEMS } from '../../layout/sidebar/admin-sidebar-items';
 import { Event } from '../../models/event.model';
 import { EventService } from '../../services/event.service';
 
@@ -9,12 +10,7 @@ import { EventService } from '../../services/event.service';
   styleUrl: './admin-events.component.css'
 })
 export class AdminEventsComponent implements OnInit {
-  menuItems: SidebarItem[] = [
-    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
-    { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Reclamations', route: ['/admin', 'reclamations'] },
-  ];
+  menuItems: SidebarItem[] = ADMIN_SIDEBAR_ITEMS;
 
   events: Event[] = [];
   loading = false;

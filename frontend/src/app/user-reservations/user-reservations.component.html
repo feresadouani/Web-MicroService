@@ -1,17 +1,5 @@
 <div class="transit-page">
-  <header class="topbar">
-    <div class="brand-section">
-      <div class="brand">🎯 Events Portal</div>
-      <p class="brand-subtitle">Reserve a room instantly</p>
-    </div>
-    <nav class="nav">
-      <a routerLink="/portal" class="nav-link">Portal</a>
-      <a routerLink="/events" class="nav-link">Events</a>
-      <a routerLink="/reservations" class="nav-link active-link">Reservations</a>
-      <a routerLink="/portal/profile" class="nav-link">My Profile</a>
-      <button type="button" class="logout-btn" (click)="logout()">Log out</button>
-    </nav>
-  </header>
+  <app-user-navbar [active]="'reservations'"></app-user-navbar>
 
   <section class="hero">
     <div class="hero-content">
