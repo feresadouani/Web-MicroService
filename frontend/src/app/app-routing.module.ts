@@ -9,6 +9,8 @@ import { AdminGuard } from './guards/admin.guard';
 import { AddEventComponent } from './admin-dashboard/add-event/add-event.component';
 import { AdminEventsComponent } from './admin-dashboard/admin-events/admin-events.component';
 import { CoursComponent } from './cours/cours.component';
+import { CourseDetailsComponent } from './course-details/course-details.component';
+import { UserCoursesComponent } from './user-courses/user-courses.component';
 
 const routes: Routes = [
   {
@@ -18,6 +20,8 @@ const routes: Routes = [
   },
   { path: 'portal', component: UserPortalComponent },
   { path: 'portal/profile', component: UserProfileComponent },
+  { path: 'portal/courses', component: UserCoursesComponent },
+  { path: 'portal/cours/:id', component: CourseDetailsComponent },
   { path: 'events', component: UserPortalComponent },
   {
     path: 'admin',
