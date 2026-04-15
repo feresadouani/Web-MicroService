@@ -17,17 +17,17 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private Long userId;
 
     // Added back to satisfy the old NOT NULL DB constraint and existing tests
-    @Column(name = "event_id", nullable = false)
+    @Column(name = "event_id")
     private Long eventId = 0L;
     
-    @Column(name = "salle_num", nullable = false, unique = true)
+    @Column(name = "salle_num", unique = true)
     private Long salleNum;
     
-    @Column(name = "reservation_date", nullable = false)
+    @Column(name = "reservation_date")
     private LocalDateTime reservationDate;
     
     @Column(name = "status", nullable = false)
