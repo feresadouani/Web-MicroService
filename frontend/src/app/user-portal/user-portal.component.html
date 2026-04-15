@@ -1,13 +1,68 @@
 <div class="portal">
   <header class="portal-header">
     <h1>Espace utilisateur</h1>
-    <button type="button" class="logout-btn" (click)="logout()">Déconnexion</button>
+    <div class="header-actions">
+      <button type="button" class="ghost-btn" (click)="loadCours()">Rafraichir</button>
+      <button type="button" class="logout-btn" (click)="logout()">Deconnexion</button>
+    </div>
   </header>
   <p class="intro">
     Bienvenue. Cet espace correspond au rôle Keycloak <strong>client_user</strong>
     (les comptes <strong>client_admin</strong> sont redirigés vers le tableau de bord).
   </p>
+  <p class="intro" *ngIf="userEmail">Utilisateur connecte: <strong>{{ userEmail }}</strong></p>
   <p class="hint" *ngIf="!isClientUser">
     Attention : aucun rôle <strong>client_user</strong> n’a été détecté sur votre jeton — contrôlez la configuration du client <strong>frontend</strong> dans Keycloak.
   </p>
+
+  <p class="error" *ngIf="error">{{ error }}</p>
+  <p *ngIf="loading">Chargement des cours...</p>
+
+  <section class="courses" *ngIf="!loading">
+    <article class="course-card" *ngFor="let cours of coursList">
+      <div class="course-head">
+        <h3>{{ cours.title }}</h3>
+        <span class="badge" [class.badge-on]="isInscrit(cours)">
+          {{ isInscrit(cours) ? 'Inscrit' : 'Non inscrit' }}
+        </span>
+      </div>
+
+      <p class="meta">
+        <strong>Categorie:</strong> {{ cours.category }}
+        <span>•</span>
+        <strong>Professeur:</strong> {{ cours.professeur || 'Non assigne' }}
+      </p>
+      <p class="content">{{ cours.content }}</p>
+
+      <div class="module-list" *ngIf="getModules(cours).length; else noModules">
+        <span class="module-chip" *ngFor="let moduleName of getModules(cours)">{{ moduleName }}</span>
+      </div>
+      <ng-template #noModules>
+        <p class="muted">Modules non renseignes</p>
+      </ng-template>
+
+      <p class="meta small">Etudiants inscrits: {{ (cours.enrolledStudents ?? []).length }}</p>
+
+      <div class="actions-row">
+        <button
+          type="button"
+          class="primary-btn"
+          *ngIf="!isInscrit(cours)"
+          (click)="inscrire(cours)"
+        >
+          S'inscrire
+        </button>
+        <button
+          type="button"
+          class="danger-btn"
+          *ngIf="isInscrit(cours)"
+          (click)="desinscrire(cours)"
+        >
+          Se desinscrire
+        </button>
+      </div>
+    </article>
+
+    <p class="muted" *ngIf="coursList.length === 0">Aucun cours disponible.</p>
+  </section>
 </div>

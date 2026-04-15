@@ -38,6 +38,7 @@
 }
 
 .create-form input,
+.create-form select,
 .create-form textarea {
   border: 1px solid #dbe2ea;
   border-radius: 8px;
@@ -76,7 +77,7 @@ th {
   font-weight: 600;
 }
 
-td:nth-child(5) {
+td:nth-child(8) {
   max-width: 380px;
   white-space: pre-wrap;
   word-break: break-word;
@@ -140,6 +141,73 @@ td:nth-child(5) {
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+.inline-edit {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.inline-edit input,
+.inline-edit select {
+  min-width: 150px;
+  border: 1px solid #dbe2ea;
+  border-radius: 8px;
+  padding: 7px 9px;
+}
+
+.module-row {
+  margin-top: 8px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  background: #e0f2fe;
+  color: #0c4a6e;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.chip-remove {
+  border: none;
+  background: transparent;
+  color: #0c4a6e;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0;
+  line-height: 1;
+}
+
+.student-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.student-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.student-row {
+  margin-bottom: 8px;
+}
+
+.muted {
+  color: #64748b;
+  margin: 6px 0 0;
+  font-size: 13px;
 }
 
 @media (max-width: 1000px) {

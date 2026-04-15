@@ -1,6 +1,7 @@
 package com.example.cours.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,6 +12,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -27,6 +30,13 @@ public class Cours {
     private LocalDateTime dateOfPost;
     private String author;
     private String category;
+    private String professeur;
+
+    @ElementCollection
+    private Set<String> modules = new LinkedHashSet<>();
+
+    @ElementCollection
+    private Set<String> enrolledStudents = new LinkedHashSet<>();
 
     @PrePersist
     void onCreate() {
