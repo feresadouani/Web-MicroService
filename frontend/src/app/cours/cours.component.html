@@ -1,0 +1,185 @@
+<div class="cours-layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems">
+  </app-sidebar>
+
+  <section class="cours-content">
+    <app-navbar></app-navbar>
+
+    <section class="header-row">
+      <div>
+        <h1>Cours</h1>
+      </div>
+      <button type="button" class="primary-btn" (click)="toggleCreateForm()">
+        {{ showCreateForm ? 'Fermer le formulaire' : 'Ajouter un cours' }}
+      </button>
+    </section>
+
+    <article class="card" *ngIf="showCreateForm">
+      <h3>Nouveau cours</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); createCours();">
+        <input [(ngModel)]="newCours.title" name="title" placeholder="Titre" required />
+        <input [(ngModel)]="newCours.author" name="author" placeholder="Auteur" required />
+        <input [(ngModel)]="newCours.category" name="category" placeholder="Categorie" required />
+        <select [(ngModel)]="newCours.professeur" name="professeur">
+          <option value="">Choisir un professeur</option>
+          <option *ngFor="let user of getProfesseurOptions()" [value]="user.email">
+            {{ getUserLabel(user) }}
+          </option>
+        </select>
+        <input
+          [ngModel]="newModulesInput"
+          (ngModelChange)="onNewModulesInputChange($event)"
+          name="modules"
+          placeholder="Modules (separes par des virgules)"
+        />
+        <textarea
+          [(ngModel)]="newCours.content"
+          name="content"
+          placeholder="Contenu du cours"
+          rows="4"
+          required
+        ></textarea>
+        <button type="submit" class="primary-btn">Enregistrer</button>
+      </form>
+    </article>
+
+    <article class="card" *ngIf="editingCoursId !== null">
+      <h3>Modifier le cours</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); saveEdit();">
+        <input [(ngModel)]="editCours.title" name="edit-title" placeholder="Titre" required />
+        <input [(ngModel)]="editCours.author" name="edit-author" placeholder="Auteur" required />
+        <input [(ngModel)]="editCours.category" name="edit-category" placeholder="Categorie" required />
+        <select [(ngModel)]="editCours.professeur" name="edit-professeur">
+          <option value="">Choisir un professeur</option>
+          <option *ngFor="let user of getProfesseurOptions()" [value]="user.email">
+            {{ getUserLabel(user) }}
+          </option>
+        </select>
+        <input
+          [(ngModel)]="editModulesInput"
+          name="edit-modules"
+          placeholder="Modules (separes par des virgules)"
+        />
+        <textarea
+          [(ngModel)]="editCours.content"
+          name="edit-content"
+          placeholder="Contenu du cours"
+          rows="4"
+          required
+        ></textarea>
+        <div class="form-actions-inline">
+          <button type="submit" class="primary-btn">Enregistrer</button>
+          <button type="button" class="ghost-btn" (click)="cancelEdit()">Annuler</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="card">
+      <div class="table-header">
+        <h3>Liste des cours</h3>
+        <button type="button" class="ghost-btn" (click)="fetchCours()">Rafraichir</button>
+      </div>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p *ngIf="loading">Chargement...</p>
+
+      <table *ngIf="!loading">
+        <thead>
+          <tr>
+            <th>Titre</th>
+            <th>Auteur</th>
+            <th>Categorie</th>
+            <th>Professeur</th>
+            <th>Modules</th>
+            <th>Etudiants</th>
+            <th>Date de publication</th>
+            <th>Contenu</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cours of coursList">
+            <td>{{ cours.title }}</td>
+            <td>{{ cours.author }}</td>
+            <td>{{ cours.category }}</td>
+            <td>
+              <div class="inline-edit">
+                <select
+                  [ngModel]="getProfesseurDraft(cours)"
+                  (ngModelChange)="professeurDraftByCoursId[cours.id!] = $event"
+                  [name]="'professeur-' + cours.id"
+                >
+                  <option value="">Choisir un professeur</option>
+                  <option *ngFor="let user of getProfesseurOptions()" [value]="user.email">
+                    {{ getUserLabel(user) }}
+                  </option>
+                </select>
+                <button type="button" class="ghost-btn btn-sm" (click)="updateProfesseur(cours)">Assigner</button>
+              </div>
+            </td>
+            <td>
+              <div class="chips" *ngIf="getModules(cours).length; else noModules">
+                <span class="chip" *ngFor="let moduleName of getModules(cours)">
+                  {{ moduleName }}
+                  <button type="button" class="chip-remove" (click)="removeModule(cours, moduleName)">x</button>
+                </span>
+              </div>
+              <ng-template #noModules>
+                <span class="muted">Aucun module</span>
+              </ng-template>
+              <div class="inline-edit module-row">
+                <input
+                  [(ngModel)]="moduleDraftByCoursId[cours.id!]"
+                  [name]="'module-' + cours.id"
+                  placeholder="Ajouter un module"
+                />
+                <button type="button" class="ghost-btn btn-sm" (click)="addModule(cours)">Ajouter</button>
+              </div>
+            </td>
+            <td>
+              <div class="inline-edit student-row">
+                <select
+                  [(ngModel)]="etudiantDraftByCoursId[cours.id!]"
+                  [name]="'etudiant-' + cours.id"
+                >
+                  <option value="">Choisir un etudiant</option>
+                  <option *ngFor="let user of getEtudiantOptions(cours)" [value]="user.email">
+                    {{ getUserLabel(user) }}
+                  </option>
+                </select>
+                <button type="button" class="ghost-btn btn-sm" (click)="inscrireEtudiant(cours)">Ajouter</button>
+              </div>
+              <button type="button" class="ghost-btn btn-sm" (click)="loadEtudiants(cours)">Afficher</button>
+              <p *ngIf="etudiantsLoadingByCoursId[cours.id!]" class="muted">Chargement...</p>
+              <ul class="student-list" *ngIf="getEtudiants(cours).length">
+                <li *ngFor="let email of getEtudiants(cours)">
+                  <span>{{ getEtudiantLabel(email) }}</span>
+                  <button
+                    type="button"
+                    class="danger-btn btn-sm"
+                    (click)="desinscrireEtudiant(cours, email)"
+                  >
+                    Retirer
+                  </button>
+                </li>
+              </ul>
+              <p class="muted" *ngIf="!etudiantsLoadingByCoursId[cours.id!] && getEtudiants(cours).length === 0">
+                Aucun etudiant inscrit
+              </p>
+            </td>
+            <td>{{ cours.dateOfPost ? (cours.dateOfPost | date : 'short') : '-' }}</td>
+            <td>{{ cours.content }}</td>
+            <td class="col-actions">
+              <div class="row-actions">
+                <button type="button" class="ghost-btn btn-sm" (click)="startEdit(cours)">Modifier</button>
+                <button type="button" class="danger-btn btn-sm" (click)="deleteCours(cours)">Supprimer</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+
+    <app-footer [text]="'© 2026 Cours Administration'"></app-footer>
+  </section>
+</div>

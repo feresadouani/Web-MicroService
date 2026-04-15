@@ -18,9 +18,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -70,7 +72,7 @@ public class KeycloakAdminService {
                         "Mot de passe obligatoire pour créer l’utilisateur dans Keycloak (vérifiez le formulaire / JSON).");
             }
             String userId = createKeycloakUser(user, plain, token);
-            assignFrontendClientRole(userId, resolveKeycloakRole(user.getRole()), token);
+            assignFrontendClientRoles(userId, resolveKeycloakRoles(user.getRole()), token);
             log.info("Keycloak : utilisateur créé pour {} (id={})", email, userId);
         } catch (Exception e) {
             log.error("Keycloak : échec sync pour {} : {}", user.getEmail(), e.getMessage(), e);
@@ -79,6 +81,10 @@ public class KeycloakAdminService {
     }
 
     public void syncUserUpdateInKeycloak(User user, String previousEmail) {
+        syncUserUpdateInKeycloak(user, previousEmail, null);
+    }
+
+    public void syncUserUpdateInKeycloak(User user, String previousEmail, String rawPassword) {
         if (!props.isEnabled()) {
             return;
         }
@@ -116,7 +122,21 @@ public class KeycloakAdminService {
                     .retrieve()
                     .toEntity(Void.class);
 
-            replaceFrontendClientRole(keycloakUserId, resolveKeycloakRole(user.getRole()), token);
+            if (rawPassword != null && !rawPassword.isBlank()) {
+                Map<String, Object> resetPasswordBody = new LinkedHashMap<>();
+                resetPasswordBody.put("type", "password");
+                resetPasswordBody.put("value", rawPassword);
+                resetPasswordBody.put("temporary", false);
+                client().put()
+                        .uri("/admin/realms/{realm}/users/{id}/reset-password", props.getTargetRealm(), keycloakUserId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .body(resetPasswordBody)
+                        .retrieve()
+                        .toEntity(Void.class);
+            }
+
+            replaceFrontendClientRoles(keycloakUserId, resolveKeycloakRoles(user.getRole()), token);
             log.info("Keycloak : utilisateur mis à jour pour {} (id={})", email, keycloakUserId);
         } catch (Exception e) {
             log.error("Keycloak : échec update pour {} : {}", user.getEmail(), e.getMessage(), e);
@@ -169,11 +189,13 @@ public class KeycloakAdminService {
         return email.trim().toLowerCase(Locale.ROOT);
     }
 
-    private String resolveKeycloakRole(String appRole) {
+    private List<String> resolveKeycloakRoles(String appRole) {
+        Set<String> roles = new LinkedHashSet<>();
+        roles.add("client_user");
         if (appRole != null && appRole.equalsIgnoreCase("ADMIN")) {
-            return "client_admin";
+            roles.add("client_admin");
         }
-        return "client_user";
+        return new ArrayList<>(roles);
     }
 
     private RestClient client() {
@@ -350,7 +372,13 @@ public class KeycloakAdminService {
                 .toEntity(Void.class);
     }
 
-    private void replaceFrontendClientRole(String keycloakUserId, String roleName, String token) throws Exception {
+    private void assignFrontendClientRoles(String keycloakUserId, List<String> roleNames, String token) throws Exception {
+        for (String roleName : roleNames) {
+            assignFrontendClientRole(keycloakUserId, roleName, token);
+        }
+    }
+
+    private void replaceFrontendClientRoles(String keycloakUserId, List<String> roleNames, String token) throws Exception {
         String clientUuid = resolveFrontendClientUuid(token);
         String userRolesJson = client().get()
                 .uri("/admin/realms/{realm}/users/{userId}/role-mappings/clients/{cid}",
@@ -376,7 +404,7 @@ public class KeycloakAdminService {
                     .toEntity(Void.class);
         }
 
-        assignFrontendClientRole(keycloakUserId, roleName, token);
+        assignFrontendClientRoles(keycloakUserId, roleNames, token);
     }
 
     private String resolveFrontendClientUuid(String token) throws Exception {

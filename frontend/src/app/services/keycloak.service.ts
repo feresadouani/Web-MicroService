@@ -53,6 +53,22 @@ class KeycloakService {
     return this._keycloak.tokenParsed;
   }
 
+  getUserEmail(): string {
+    const parsed = this._keycloak?.tokenParsed as Record<string, unknown> | undefined;
+    const email = parsed?.['email'];
+    if (typeof email === 'string' && email.trim().length > 0) {
+      return email.trim().toLowerCase();
+    }
+
+    const preferredUsername = parsed?.['preferred_username'];
+    if (typeof preferredUsername === 'string' && preferredUsername.trim().length > 0) {
+      return preferredUsername.trim().toLowerCase();
+    }
+
+    const sub = parsed?.['sub'];
+    return typeof sub === 'string' ? sub : '';
+  }
+
   getRoleNames(): string[] {
     const parsed = this._keycloak?.tokenParsed as Record<string, unknown> | undefined;
     if (!parsed) {
