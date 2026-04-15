@@ -5,4 +5,5 @@ export interface Event {
   location: string;
   date: Date;
   isSubscribed?: boolean;
+  registeredUsers?: Map<string, string> | { [key: string]: string };
 }

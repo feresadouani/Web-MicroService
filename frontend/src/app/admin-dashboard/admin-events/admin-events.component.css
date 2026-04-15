@@ -142,6 +142,68 @@ th {
   font-size: 13px;
 }
 
+/* ── Subscribers expansion ────────────────────────────────────── */
+
+.detail-row {
+  background: #f8fafc;
+}
+
+.detail-row td {
+  padding: 0;
+  border-bottom: none;
+}
+
+.subscribers-container {
+  padding: 12px;
+}
+
+.subscribers-container h4 {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.no-subscribers {
+  color: #64748b;
+  font-style: italic;
+  text-align: center;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.subscribers-table {
+  margin: 0;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.subscribers-table th {
+  background: #f1f5f9;
+  padding: 8px 12px;
+  border-bottom: 1px solid #dbe2ea;
+}
+
+.subscribers-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.subscribers-table tr:last-child td {
+  border-bottom: none;
+}
+
+.subscribers-table .user-id {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  background: #f8fafc;
+  max-width: 300px;
+  word-break: break-all;
+}
+
 @media (max-width: 1000px) {
   .events-layout {
     grid-template-columns: 1fr;

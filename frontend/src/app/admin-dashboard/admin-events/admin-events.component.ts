@@ -20,6 +20,7 @@ export class AdminEventsComponent implements OnInit {
   loading = false;
   error = '';
   editingEvent: Event | null = null;
+  expandedEventId: number | null = null;
 
   constructor(private readonly eventService: EventService) {}
 
@@ -77,6 +78,29 @@ export class AdminEventsComponent implements OnInit {
         this.error = 'An error occurred while updating the event.';
       }
     });
+  }
+
+  toggleSubscribers(eventId: number | undefined): void {
+    if (eventId === undefined) return;
+    this.expandedEventId = this.expandedEventId === eventId ? null : eventId;
+  }
+
+  getSubscribersList(event: Event): Array<{ firstName: string; email: string }> {
+    if (!event.registeredUsers) return [];
+    const users = event.registeredUsers as { [key: string]: string };
+    return Object.entries(users).map(([, displayName]) => {
+      const raw = displayName ?? '';
+      const [firstName, email] = raw.includes('|') ? raw.split('|', 2) : [raw, ''];
+      return {
+        firstName: (firstName ?? '').trim(),
+        email: (email ?? '').trim()
+      };
+    });
+  }
+
+  getSubscriberCount(event: Event): number {
+    if (!event.registeredUsers) return 0;
+    return Object.keys(event.registeredUsers).length;
   }
 
   deleteEvent(event: Event): void {

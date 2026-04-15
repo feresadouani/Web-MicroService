@@ -5,9 +5,10 @@ import org.example.event.events.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.Base64;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -112,6 +113,136 @@ public class EventController {
             return ResponseEntity.ok(regs);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // ── Subscribe endpoints (for frontend) ──────────────────────────────────
+
+    /**
+     * POST /events/{id}/subscribe
+     * Subscribe the current user (from JWT token) to an event.
+     */
+    @PostMapping("/{id}/subscribe")
+    public ResponseEntity<Event> subscribe(@PathVariable Long id, HttpServletRequest request) {
+        try {
+            String userId = extractUserIdFromJWT(request);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            String firstName = extractClaimFromJWT(request, "given_name");
+            if (firstName == null || firstName.isBlank()) {
+                firstName = extractClaimFromJWT(request, "firstName");
+            }
+            if (firstName == null || firstName.isBlank()) {
+                firstName = extractClaimFromJWT(request, "preferred_username");
+            }
+            if (firstName == null || firstName.isBlank()) {
+                firstName = "User";
+            }
+
+            String email = extractClaimFromJWT(request, "email");
+            if (email == null) email = "";
+
+            // Persist as "firstName|email" to keep existing map schema.
+            String displayName = firstName + "|" + email;
+
+            Event updated = eventService.registerUser(id, userId, displayName);
+            if (updated == null) return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(updated);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * DELETE /events/{id}/subscribe
+     * Unsubscribe the current user (from JWT token) from an event.
+     */
+    @DeleteMapping("/{id}/subscribe")
+    public ResponseEntity<Event> unsubscribe(@PathVariable Long id, HttpServletRequest request) {
+        try {
+            String userId = extractUserIdFromJWT(request);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            Event updated = eventService.unregisterUser(id, userId);
+            if (updated == null) return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(updated);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * GET /events/{id}/is-subscribed
+     * Check if the current user (from JWT token) is subscribed to an event.
+     */
+    @GetMapping("/{id}/is-subscribed")
+    public ResponseEntity<Map<String, Boolean>> isSubscribed(@PathVariable Long id, HttpServletRequest request) {
+        try {
+            String userId = extractUserIdFromJWT(request);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            Map<String, String> registrations = eventService.getRegistrations(id);
+            if (registrations == null) {
+                return ResponseEntity.notFound().build();
+            }
+            boolean isSubscribed = registrations.containsKey(userId);
+            return ResponseEntity.ok(Map.of("isSubscribed", isSubscribed));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Extract userId (sub claim) from JWT token in Authorization header.
+     */
+    private String extractUserIdFromJWT(HttpServletRequest request) {
+        try {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return null;
+            }
+
+            String token = authHeader.substring(7);
+            String[] parts = token.split("\\.");
+            if (parts.length != 3) {
+                return null;
+            }
+
+            String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
+            JSONObject json = new JSONObject(payload);
+            return json.getString("sub");
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Extract a claim from JWT token payload (Authorization: Bearer ...).
+     */
+    private String extractClaimFromJWT(HttpServletRequest request, String claim) {
+        try {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return null;
+            }
+
+            String token = authHeader.substring(7);
+            String[] parts = token.split("\\.");
+            if (parts.length != 3) {
+                return null;
+            }
+
+            String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
+            JSONObject json = new JSONObject(payload);
+            if (!json.has(claim) || json.isNull(claim)) {
+                return null;
+            }
+            return json.get(claim).toString();
+        } catch (Exception ex) {
+            return null;
         }
     }
 }
