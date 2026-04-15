@@ -1,0 +1,113 @@
+<div class="clubs-layout">
+  <app-sidebar [title]="'Dashboard Admin'" [items]="menuItems"></app-sidebar>
+
+  <section class="clubs-content">
+    <app-navbar></app-navbar>
+
+    <section class="header-row">
+      <div>
+        <h1>Clubs</h1>
+      </div>
+      <button type="button" class="primary-btn" (click)="toggleCreateForm()">
+        {{ showCreateForm ? 'Fermer le formulaire' : 'Créer un club' }}
+      </button>
+    </section>
+
+    <article class="card" *ngIf="showCreateForm">
+      <h3>Nouveau club</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); createClub();">
+        <input [(ngModel)]="newClub.name" name="name" placeholder="Nom" required />
+        <input [(ngModel)]="newClub.description" name="description" placeholder="Description" required />
+        <button type="submit" class="primary-btn">Enregistrer</button>
+      </form>
+    </article>
+
+    <article class="card" *ngIf="editingClubId !== null">
+      <h3>Modifier le club</h3>
+      <form class="create-form" (submit)="$event.preventDefault(); saveEdit();">
+        <input [(ngModel)]="editClub.name" name="edit-name" placeholder="Nom" required />
+        <input [(ngModel)]="editClub.description" name="edit-description" placeholder="Description" required />
+        <div class="form-actions-inline">
+          <button type="submit" class="primary-btn">Enregistrer</button>
+          <button type="button" class="ghost-btn" (click)="cancelEdit()">Annuler</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="card">
+      <div class="table-header">
+        <h3>Liste des clubs</h3>
+        <button type="button" class="ghost-btn" (click)="fetchClubs()">Rafraîchir</button>
+      </div>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p *ngIf="loading">Chargement...</p>
+
+      <table *ngIf="!loading">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Membres</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let club of clubs">
+            <td>{{ club.name }}</td>
+            <td class="col-description">{{ club.description }}</td>
+            <td>
+              <div class="inline-edit member-row">
+                <input
+                  [(ngModel)]="getMemberDraft(club).name"
+                  [name]="'member-name-' + club.id"
+                  placeholder="Nom membre"
+                />
+                <input
+                  [(ngModel)]="getMemberDraft(club).email"
+                  [name]="'member-email-' + club.id"
+                  placeholder="Email membre"
+                />
+                <button type="button" class="ghost-btn btn-sm" (click)="addMember(club)">
+                  Ajouter
+                </button>
+                <button type="button" class="ghost-btn btn-sm" (click)="loadMembers(club)">
+                  Lister
+                </button>
+              </div>
+
+              <p *ngIf="club.id != null && membersLoadingByClubId[club.id]" class="muted">Chargement...</p>
+              <ul class="member-list" *ngIf="getMembers(club).length">
+                <li *ngFor="let member of getMembers(club)">
+                  <span>
+                    <strong>{{ member.name }}</strong>
+                    <small class="muted-inline">{{ member.email }}</small>
+                  </span>
+                  <button
+                    type="button"
+                    class="danger-btn btn-sm"
+                    (click)="removeMember(club, member)"
+                  >
+                    Retirer
+                  </button>
+                </li>
+              </ul>
+              <p class="muted" *ngIf="club.id != null && !membersLoadingByClubId[club.id] && getMembers(club).length === 0">
+                Aucun membre
+              </p>
+            </td>
+            <td class="col-actions">
+              <div class="row-actions">
+                <button type="button" class="ghost-btn btn-sm" (click)="startEdit(club)">Modifier</button>
+                <button type="button" class="danger-btn btn-sm" (click)="deleteClub(club)">Supprimer</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+
+    <app-footer [text]="'© 2026 Clubs Administration'"></app-footer>
+  </section>
+</div>
+

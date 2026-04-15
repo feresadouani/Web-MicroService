@@ -17,7 +17,8 @@ export class CoursComponent implements OnInit {
   menuItems: SidebarItem[] = [
     { label: 'Dashboard', route: ['/admin', 'dashboard'] },
     { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Cours', route: ['/admin', 'cours'] }
+    { label: 'Cours', route: ['/admin', 'cours'] },
+    { label: 'Clubs', route: ['/admin', 'clubs'] }
   ];
 
   coursList: CoursDto[] = [];

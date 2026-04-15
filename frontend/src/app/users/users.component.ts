@@ -16,7 +16,8 @@ export class UsersComponent implements OnInit, OnDestroy {
     { label: 'Users', route: ['/admin', 'users'] },
     { label: 'Cours', route: ['/admin', 'cours'] },
     { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Add Event', route: ['/admin', 'events', 'add'] }
+    { label: 'Add Event', route: ['/admin', 'events', 'add'] },
+    { label: 'Clubs', route: ['/admin', 'clubs'] }
   ];
 
   users: UserDto[] = [];

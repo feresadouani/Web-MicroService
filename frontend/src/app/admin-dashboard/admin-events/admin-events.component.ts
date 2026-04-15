@@ -13,7 +13,8 @@ export class AdminEventsComponent implements OnInit {
     { label: 'Dashboard', route: ['/admin', 'dashboard'] },
     { label: 'Users', route: ['/admin', 'users'] },
     { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Add Event', route: ['/admin', 'events', 'add'] }
+    { label: 'Add Event', route: ['/admin', 'events', 'add'] },
+    { label: 'Clubs', route: ['/admin', 'clubs'] }
   ];
 
   events: Event[] = [];

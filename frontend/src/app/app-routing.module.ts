@@ -9,6 +9,7 @@ import { AdminGuard } from './guards/admin.guard';
 import { AddEventComponent } from './admin-dashboard/add-event/add-event.component';
 import { AdminEventsComponent } from './admin-dashboard/admin-events/admin-events.component';
 import { CoursComponent } from './cours/cours.component';
+import { ClubsComponent } from './clubs/clubs.component';
 
 const routes: Routes = [
   {
@@ -28,7 +29,8 @@ const routes: Routes = [
       { path: 'users', component: UsersComponent },
       { path: 'cours', component: CoursComponent },
       { path: 'events', component: AdminEventsComponent },
-      { path: 'events/add', component: AddEventComponent }
+      { path: 'events/add', component: AddEventComponent },
+      { path: 'clubs', component: ClubsComponent }
     ]
   },
   { path: '**', redirectTo: '' }

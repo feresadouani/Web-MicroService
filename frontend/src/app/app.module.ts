@@ -18,6 +18,7 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 import { CoursComponent } from './cours/cours.component';
 import { AddEventComponent } from './admin-dashboard/add-event/add-event.component';
 import { AdminEventsComponent } from './admin-dashboard/admin-events/admin-events.component';
+import { ClubsComponent } from './clubs/clubs.component';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -40,7 +41,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     NavbarComponent,
     FooterComponent,
     AddEventComponent,
-    AdminEventsComponent
+    AdminEventsComponent,
+    ClubsComponent
   ],
   imports: [
     BrowserModule,
