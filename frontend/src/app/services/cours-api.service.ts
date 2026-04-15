@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { APP_CONFIG } from '../app-config';
 
 export interface CoursDto {
   id?: number;
@@ -36,7 +37,7 @@ export interface UpdateCoursPayload {
   providedIn: 'root'
 })
 export class CoursApiService {
-  private readonly gatewayBaseUrl = 'http://localhost:8081';
+  private readonly gatewayBaseUrl = APP_CONFIG.gatewayBaseUrl;
 
   constructor(private readonly http: HttpClient) {}
 

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { APP_CONFIG } from '../app-config';
 
 export type ReclamationStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
 
@@ -42,7 +43,7 @@ function normalizeReclamation(raw: ReclamationApiRow): Reclamation {
   providedIn: 'root'
 })
 export class ReclamationService {
-  private readonly API_URL = 'http://localhost:8081/reclamations';
+  private readonly API_URL = `${APP_CONFIG.gatewayBaseUrl}/reclamations`;
 
   constructor(private readonly http: HttpClient) {}
 

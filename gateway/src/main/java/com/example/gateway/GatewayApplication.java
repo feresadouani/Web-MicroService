@@ -19,19 +19,19 @@ public class GatewayApplication {
         return builder.routes()
                 .route("users",
                         r -> r.path("/users/**")
-                                .uri("lb://user-service"))
+                                .uri("lb://USER-SERVICE"))
             .route("cours",
                 r->r.path("/cours/**")
-                    .uri("lb://cours"))
+                    .uri("lb://COURS"))
                 .route("events", r -> r.path("/events/**", "/api/events", "/api/events/**")
                         .filters(f -> f
                                 .rewritePath("/api/events$", "/events")
                                 .rewritePath("/api/events/(?<segment>.*)", "/events/${segment}"))
-                        .uri("lb://events"))
+                        .uri("lb://EVENTS"))
                 .route("reclamations", r -> r.path("/reclamations/**")
-                        .uri("lb://reclamation-service"))
+                        .uri("lb://RECLAMATION-SERVICE"))
                 .route("reservations", r -> r.path("/reservations/**")
-                        .uri("lb://reservation-service"))
+                        .uri("lb://RESERVATION-SERVICE"))
                 .build();
     }
 }

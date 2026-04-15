@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { APP_CONFIG } from '../app-config';
 
 export interface MemberDto {
   id?: number;
@@ -34,7 +35,7 @@ export interface CreateMemberPayload {
   providedIn: 'root'
 })
 export class ClubApiService {
-  private readonly gatewayBaseUrl = 'http://localhost:8081';
+  private readonly gatewayBaseUrl = APP_CONFIG.gatewayBaseUrl;
   private readonly clubsBasePath = '/api/clubs';
 
   constructor(private readonly http: HttpClient) {}

@@ -1,11 +1,12 @@
 import Keycloak from 'keycloak-js';
+import { APP_CONFIG } from '../app-config';
 
 class KeycloakService {
   private _keycloak!: Keycloak.KeycloakInstance;
 
   init(): Promise<boolean> {
     this._keycloak = new Keycloak({
-      url: 'http://localhost:8080',
+      url: APP_CONFIG.keycloakUrl,
       realm: 'spring',
       clientId: 'frontend'
     });
@@ -45,7 +46,7 @@ class KeycloakService {
 
   login(): Promise<void> {
     return this._keycloak.login({
-      redirectUri: 'http://localhost:4200'
+      redirectUri: APP_CONFIG.frontendOrigin
     });
   }
 
@@ -108,7 +109,7 @@ class KeycloakService {
 
   logout() {
     this._keycloak.logout({
-      redirectUri: 'http://localhost:4200'
+      redirectUri: APP_CONFIG.frontendOrigin
     });
   }
 }

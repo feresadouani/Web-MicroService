@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { APP_CONFIG } from '../app-config';
 
 export interface ReservationDto {
   id?: number;
@@ -33,7 +34,7 @@ export interface UpdateReservationPayload {
   providedIn: 'root'
 })
 export class ReservationApiService {
-  private readonly gatewayBaseUrl = 'http://localhost:8081';
+  private readonly gatewayBaseUrl = APP_CONFIG.gatewayBaseUrl;
 
   constructor(private readonly http: HttpClient) {}
 
