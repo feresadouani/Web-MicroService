@@ -44,10 +44,6 @@ export class CoursApiService {
     return this.http.get<CoursDto[]>(`${this.gatewayBaseUrl}/cours`);
   }
 
-  getCoursById(id: number): Observable<CoursDto> {
-    return this.http.get<CoursDto>(`${this.gatewayBaseUrl}/cours/${id}`);
-  }
-
   createCours(payload: CreateCoursPayload): Observable<CoursDto> {
     return this.http.post<CoursDto>(`${this.gatewayBaseUrl}/cours`, payload);
   }
