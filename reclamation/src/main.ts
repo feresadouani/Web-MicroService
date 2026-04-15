@@ -1,11 +1,19 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Eureka } from 'eureka-js-client';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
-  const PORT = process.env.PORT ?? 3000;
+  const PORT = Number(process.env.PORT ?? 3000);
 
   await app.listen(PORT);
 
@@ -19,8 +27,8 @@ async function bootstrap() {
         '@enabled': true,
       },
       vipAddress: 'RECLAMATION-SERVICE',
-      statusPageUrl: `http://localhost:${PORT}`,
-      healthCheckUrl: `http://localhost:${PORT}`,
+      statusPageUrl: `http://localhost:${PORT}/health`,
+      healthCheckUrl: `http://localhost:${PORT}/health`,
       dataCenterInfo: {
         name: 'MyOwn',
         '@class': 'com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo',

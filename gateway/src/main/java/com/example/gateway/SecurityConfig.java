@@ -39,21 +39,13 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeExchange(exchange -> exchange
-                        /* Preflight CORS: pas de JWT sur OPTIONS — sinon 401 sans en-têtes CORS */
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        /* Santé du microservice reclamation (routé par la gateway) — sans JWT pour Postman / probes */
-                        .pathMatchers(HttpMethod.GET, "/health").permitAll()
                         .pathMatchers("/public/**").permitAll()
-                        /* Keycloak : rôle client client_admin → ROLE_CLIENT_ADMIN */
                         .pathMatchers("/admin/**").hasRole("CLIENT_ADMIN")
-                        /* Aligné sur le microservice user: JWT valide suffit (évite 403 si rôles uniquement client-side Keycloak) */
                         .pathMatchers("/users/**").authenticated()
+                        .pathMatchers("/reclamations/**").authenticated()
                         .anyExchange().authenticated()
                 )
-                /*
-                 * Pas de @Bean JwtDecoder ici : en WebFlux il est bloquant et casse la validation JWT (401).
-                 * spring.security.oauth2.resourceserver.jwt.issuer-uri fournit un ReactiveJwtDecoder adapté.
-                 */
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
                 )
@@ -66,10 +58,7 @@ public class SecurityConfig {
         return new ReactiveJwtAuthenticationConverterAdapter(jwtAuthenticationConverter);
     }
 
-    /**
-     * Keycloak : rôles realm dans {@code realm_access.roles}, rôles client souvent dans
-     * {@code resource_access.&lt;clientId&gt;.roles} (ex. client public {@code frontend}).
-     */
+
     private Collection<GrantedAuthority> extractKeycloakAuthorities(Jwt jwt) {
         Set<String> roleNames = new LinkedHashSet<>();
         addRolesFromMap(jwt.getClaimAsMap("realm_access"), roleNames);
@@ -106,10 +95,7 @@ public class SecurityConfig {
         }
     }
 
-    /**
-     * Source CORS utilisée par {@link ServerHttpSecurity#cors(Customizer)} (WebFlux).
-     * Évite le doublon CorsWebFilter + assure l’ordre correct avec la chaîne de sécurité.
-     */
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
