@@ -2,7 +2,6 @@ package com.example.gateway;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,12 +11,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -37,7 +32,6 @@ public class SecurityConfig {
             ReactiveJwtAuthenticationConverterAdapter jwtAuthenticationConverter) {
         return http
                 .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
                 .authorizeExchange(exchange -> exchange
                         /* Preflight CORS: pas de JWT sur OPTIONS — sinon 401 sans en-têtes CORS */
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -46,6 +40,7 @@ public class SecurityConfig {
                         .pathMatchers("/admin/**").hasRole("CLIENT_ADMIN")
                         /* Aligné sur le microservice user: JWT valide suffit (évite 403 si rôles uniquement client-side Keycloak) */
                         .pathMatchers("/users/**").authenticated()
+                        .pathMatchers("/events/**","/api/events/**").authenticated()
                         .anyExchange().authenticated()
                 )
                 /*
@@ -102,24 +97,6 @@ public class SecurityConfig {
                 out.add(s);
             }
         }
-    }
-
-    /**
-     * Source CORS utilisée par {@link ServerHttpSecurity#cors(Customizer)} (WebFlux).
-     * Évite le doublon CorsWebFilter + assure l’ordre correct avec la chaîne de sécurité.
-     */
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
-        config.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
     }
 
 }
