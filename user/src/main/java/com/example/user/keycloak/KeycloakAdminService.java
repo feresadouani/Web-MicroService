@@ -23,9 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Création d’utilisateurs Keycloak après ajout en base, et détection des comptes déjà présents (inscription KC).
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -34,8 +32,7 @@ public class KeycloakAdminService {
     private final KeycloakAdminProperties props;
     private final ObjectMapper objectMapper;
 
-    /** Mot de passe en clair mémorisé dans {@code onBeforeCreate} (perdu ou hashé sur l’entité après persist). */
-    private final ConcurrentHashMap<String, String> plainPasswordByEmail = new ConcurrentHashMap<>();
+   private final ConcurrentHashMap<String, String> plainPasswordByEmail = new ConcurrentHashMap<>();
 
     public void stashPlainPasswordForNewUser(String email, String rawPassword) {
         if (email == null || email.isBlank() || rawPassword == null || rawPassword.isBlank()) {
@@ -50,10 +47,7 @@ public class KeycloakAdminService {
         }
     }
 
-    /**
-     * Appelé après {@code save} sur {@link User} (ex. POST Data REST).
-     * Si l’email existe déjà dans Keycloak (ex. utilisateur venant de s’inscrire), on n’essaie pas de recréer.
-     */
+
     public void syncUserToKeycloakAfterPersist(User user) {
         if (!props.isEnabled()) {
             log.debug("Keycloak : synchronisation désactivée (keycloak.admin.enabled=false).");
@@ -81,6 +75,80 @@ public class KeycloakAdminService {
         } catch (Exception e) {
             log.error("Keycloak : échec sync pour {} : {}", user.getEmail(), e.getMessage(), e);
             throw new RuntimeException("Impossible de créer l’utilisateur dans Keycloak : " + e.getMessage(), e);
+        }
+    }
+
+    public void syncUserUpdateInKeycloak(User user, String previousEmail) {
+        if (!props.isEnabled()) {
+            return;
+        }
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            log.warn("Keycloak : email vide, update ignorée.");
+            return;
+        }
+        try {
+            String token = fetchAdminAccessToken();
+            JsonNode keycloakUser = findUserByEmail(previousEmail, token);
+            if (keycloakUser == null) {
+                keycloakUser = findUserByEmail(user.getEmail(), token);
+            }
+            if (keycloakUser == null || !keycloakUser.hasNonNull("id")) {
+                log.warn("Keycloak : utilisateur introuvable pour update (previousEmail={}, email={}).",
+                        previousEmail, user.getEmail());
+                return;
+            }
+
+            String keycloakUserId = keycloakUser.get("id").asText();
+            Map<String, Object> updateBody = new LinkedHashMap<>();
+            String email = user.getEmail().trim();
+            updateBody.put("username", email);
+            updateBody.put("email", email);
+            updateBody.put("firstName", Optional.ofNullable(user.getFirstname()).orElse(""));
+            updateBody.put("lastName", Optional.ofNullable(user.getLastname()).orElse(""));
+            updateBody.put("enabled", true);
+            updateBody.put("emailVerified", true);
+
+            client().put()
+                    .uri("/admin/realms/{realm}/users/{id}", props.getTargetRealm(), keycloakUserId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                    .body(updateBody)
+                    .retrieve()
+                    .toEntity(Void.class);
+
+            replaceFrontendClientRole(keycloakUserId, resolveKeycloakRole(user.getRole()), token);
+            log.info("Keycloak : utilisateur mis à jour pour {} (id={})", email, keycloakUserId);
+        } catch (Exception e) {
+            log.error("Keycloak : échec update pour {} : {}", user.getEmail(), e.getMessage(), e);
+            throw new RuntimeException("Impossible de modifier l’utilisateur dans Keycloak : " + e.getMessage(), e);
+        }
+    }
+
+    public void syncUserDeletionInKeycloak(String email) {
+        if (!props.isEnabled()) {
+            return;
+        }
+        if (email == null || email.isBlank()) {
+            log.warn("Keycloak : email vide, suppression ignorée.");
+            return;
+        }
+        try {
+            String token = fetchAdminAccessToken();
+            JsonNode keycloakUser = findUserByEmail(email, token);
+            if (keycloakUser == null || !keycloakUser.hasNonNull("id")) {
+                log.info("Keycloak : aucun utilisateur trouvé pour suppression ({})", email);
+                return;
+            }
+            String keycloakUserId = keycloakUser.get("id").asText();
+            client().delete()
+                    .uri("/admin/realms/{realm}/users/{id}", props.getTargetRealm(), keycloakUserId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                    .retrieve()
+                    .toEntity(Void.class);
+            log.info("Keycloak : utilisateur supprimé pour {} (id={})", email, keycloakUserId);
+        } catch (Exception e) {
+            log.error("Keycloak : échec suppression pour {} : {}", email, e.getMessage(), e);
+            throw new RuntimeException("Impossible de supprimer l’utilisateur dans Keycloak : " + e.getMessage(), e);
         }
     }
 
@@ -165,7 +233,30 @@ public class KeycloakAdminService {
     }
 
     private boolean keycloakUserExists(String email, String token) {
-        String json = client().get()
+        String json = searchUserByEmailJson(email, token);
+        try {
+            JsonNode arr = objectMapper.readTree(json);
+            return arr.isArray() && !arr.isEmpty();
+        } catch (Exception e) {
+            log.warn("Keycloak : lecture réponse recherche utilisateur : {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private JsonNode findUserByEmail(String email, String token) throws Exception {
+        if (email == null || email.isBlank()) {
+            return null;
+        }
+        String json = searchUserByEmailJson(email, token);
+        JsonNode arr = objectMapper.readTree(json);
+        if (!arr.isArray() || arr.isEmpty()) {
+            return null;
+        }
+        return arr.get(0);
+    }
+
+    private String searchUserByEmailJson(String email, String token) {
+        return client().get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/admin/realms/{realm}/users")
                         .queryParam("email", email.trim())
@@ -174,13 +265,6 @@ public class KeycloakAdminService {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .retrieve()
                 .body(String.class);
-        try {
-            JsonNode arr = objectMapper.readTree(json);
-            return arr.isArray() && !arr.isEmpty();
-        } catch (Exception e) {
-            log.warn("Keycloak : lecture réponse recherche utilisateur : {}", e.getMessage());
-            return false;
-        }
     }
 
     private String createKeycloakUser(User user, String plainPassword, String token) throws Exception {
@@ -217,7 +301,6 @@ public class KeycloakAdminService {
             throw e;
         }
 
-        // Localiser l’ID : recherche exacte après création
         String listJson = client().get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/admin/realms/{realm}/users")
@@ -265,6 +348,35 @@ public class KeycloakAdminService {
                 .body(List.of(roleMap))
                 .retrieve()
                 .toEntity(Void.class);
+    }
+
+    private void replaceFrontendClientRole(String keycloakUserId, String roleName, String token) throws Exception {
+        String clientUuid = resolveFrontendClientUuid(token);
+        String userRolesJson = client().get()
+                .uri("/admin/realms/{realm}/users/{userId}/role-mappings/clients/{cid}",
+                        props.getTargetRealm(), keycloakUserId, clientUuid)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .retrieve()
+                .body(String.class);
+
+        JsonNode assignedRoles = objectMapper.readTree(userRolesJson);
+        if (assignedRoles.isArray() && !assignedRoles.isEmpty()) {
+            List<Map<String, Object>> assignedRoleMaps = new ArrayList<>();
+            for (JsonNode r : assignedRoles) {
+                assignedRoleMaps.add(objectMapper.convertValue(r, new TypeReference<>() {
+                }));
+            }
+            client().method(org.springframework.http.HttpMethod.DELETE)
+                    .uri("/admin/realms/{realm}/users/{userId}/role-mappings/clients/{cid}",
+                            props.getTargetRealm(), keycloakUserId, clientUuid)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                    .body(assignedRoleMaps)
+                    .retrieve()
+                    .toEntity(Void.class);
+        }
+
+        assignFrontendClientRole(keycloakUserId, roleName, token);
     }
 
     private String resolveFrontendClientUuid(String token) throws Exception {

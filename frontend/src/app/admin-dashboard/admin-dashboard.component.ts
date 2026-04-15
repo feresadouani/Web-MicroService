@@ -1,32 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SidebarItem } from '../layout/sidebar/sidebar.component';
-import { UserApiService, UserDto } from '../services/user-api.service';
+import { UserApiService } from '../services/user-api.service';
 
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent implements OnInit {
+  userMiniStatCount: number | null = null;
+  userMiniStatLoading = true;
+  userMiniStatError = false;
+
   menuItems: SidebarItem[] = [
     { label: 'Dashboard', route: ['/admin', 'dashboard'] },
     { label: 'Users', route: ['/admin', 'users'] },
     { label: 'Cours', route: ['/admin', 'cours'] }
+    { label: 'Events', route: ['/admin', 'events'] },
+    { label: 'Add Event', route: ['/admin', 'events', 'add'] }
   ];
 
-  userSearchQuery = '';
-  userSearchResults: UserDto[] = [];
-  userSearchLoading = false;
-  userSearchError = '';
-  userSearchAttempted = false;
-
-  constructor(private readonly userApi: UserApiService) {}
-
-  kpis = [
-    { title: 'Total Contacts', value: '1,234', trend: '+12% from last month', icon: '👥' },
-    { title: 'Companies', value: '456', trend: '+8% from last month', icon: '🏢' },
-    { title: 'Active Deals', value: '89', trend: '+23% from last month', icon: '📈' },
-    { title: 'Revenue', value: '$234,567', trend: '+18% from last month', icon: '💵' }
+  kpis: { title: string; value: string; trend: string; icon: 'building' | 'chart' | 'money' }[] = [
+    { title: 'Companies', value: '456', trend: '+8% from last month', icon: 'building' },
+    { title: 'Active Deals', value: '89', trend: '+23% from last month', icon: 'chart' },
+    { title: 'Revenue', value: '$234,567', trend: '+18% from last month', icon: 'money' }
   ];
 
   activities = [
@@ -41,26 +38,18 @@ export class AdminDashboardComponent {
     { title: 'Review contracts', date: 'Friday at 3:00 PM' }
   ];
 
-  searchUsers(): void {
-    this.userSearchAttempted = true;
-    this.userSearchLoading = true;
-    this.userSearchError = '';
-    this.userApi.getUsers(this.userSearchQuery || undefined).subscribe({
+  constructor(private readonly userApi: UserApiService) {}
+
+  ngOnInit(): void {
+    this.userApi.getUsers().subscribe({
       next: (users) => {
-        this.userSearchResults = users;
-        this.userSearchLoading = false;
+        this.userMiniStatCount = users.length;
+        this.userMiniStatLoading = false;
       },
-      error: (err) => {
-        this.userSearchError = `Erreur recherche: ${err.status} ${err.statusText ?? ''}`;
-        this.userSearchLoading = false;
+      error: () => {
+        this.userMiniStatError = true;
+        this.userMiniStatLoading = false;
       }
     });
-  }
-
-  clearUserSearch(): void {
-    this.userSearchQuery = '';
-    this.userSearchResults = [];
-    this.userSearchError = '';
-    this.userSearchAttempted = false;
   }
 }

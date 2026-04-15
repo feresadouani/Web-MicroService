@@ -61,12 +61,9 @@
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  background: #16a34a;
-  color: #fff;
-  font-size: 11px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  object-fit: cover;
+  flex-shrink: 0;
+  display: block;
 }
 
 .account-text {

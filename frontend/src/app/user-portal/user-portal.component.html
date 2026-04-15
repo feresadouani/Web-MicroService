@@ -1,68 +1,134 @@
-<div class="portal">
-  <header class="portal-header">
-    <h1>Espace utilisateur</h1>
-    <div class="header-actions">
-      <button type="button" class="ghost-btn" (click)="loadCours()">Rafraichir</button>
-      <button type="button" class="logout-btn" (click)="logout()">Deconnexion</button>
+<div class="transit-page">
+
+  <header class="topbar">
+    <div class="brand-section">
+      <div class="brand">🎯 Events Portal</div>
+      <p class="brand-subtitle">Discover and join exciting events</p>
     </div>
+    <nav class="nav">
+      <a href="#features" class="nav-link">About</a>
+      <a routerLink="/events" class="nav-link">Events</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <button type="button" class="logout-btn" (click)="logout()">Log out</button>
+    </nav>
   </header>
-  <p class="intro">
-    Bienvenue. Cet espace correspond au rôle Keycloak <strong>client_user</strong>
-    (les comptes <strong>client_admin</strong> sont redirigés vers le tableau de bord).
-  </p>
-  <p class="intro" *ngIf="userEmail">Utilisateur connecte: <strong>{{ userEmail }}</strong></p>
-  <p class="hint" *ngIf="!isClientUser">
-    Attention : aucun rôle <strong>client_user</strong> n’a été détecté sur votre jeton — contrôlez la configuration du client <strong>frontend</strong> dans Keycloak.
-  </p>
-
-  <p class="error" *ngIf="error">{{ error }}</p>
-  <p *ngIf="loading">Chargement des cours...</p>
-
-  <section class="courses" *ngIf="!loading">
-    <article class="course-card" *ngFor="let cours of coursList">
-      <div class="course-head">
-        <h3>{{ cours.title }}</h3>
-        <span class="badge" [class.badge-on]="isInscrit(cours)">
-          {{ isInscrit(cours) ? 'Inscrit' : 'Non inscrit' }}
-        </span>
-      </div>
-
-      <p class="meta">
-        <strong>Categorie:</strong> {{ cours.category }}
-        <span>•</span>
-        <strong>Professeur:</strong> {{ cours.professeur || 'Non assigne' }}
-      </p>
-      <p class="content">{{ cours.content }}</p>
-
-      <div class="module-list" *ngIf="getModules(cours).length; else noModules">
-        <span class="module-chip" *ngFor="let moduleName of getModules(cours)">{{ moduleName }}</span>
-      </div>
-      <ng-template #noModules>
-        <p class="muted">Modules non renseignes</p>
-      </ng-template>
-
-      <p class="meta small">Etudiants inscrits: {{ (cours.enrolledStudents ?? []).length }}</p>
-
-      <div class="actions-row">
-        <button
-          type="button"
-          class="primary-btn"
-          *ngIf="!isInscrit(cours)"
-          (click)="inscrire(cours)"
-        >
-          S'inscrire
-        </button>
-        <button
-          type="button"
-          class="danger-btn"
-          *ngIf="isInscrit(cours)"
-          (click)="desinscrire(cours)"
-        >
-          Se desinscrire
-        </button>
-      </div>
-    </article>
-
-    <p class="muted" *ngIf="coursList.length === 0">Aucun cours disponible.</p>
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to Events</h1>
+      <p>Discover amazing events happening around you. Connect with like-minded people and create unforgettable memories.</p>
+      <a class="cta-primary" href="#events">View Events</a>
+    </div>
   </section>
+
+  <section class="notice" *ngIf="!isClientUser">
+    ⚠️ Warning: no <strong>client_user</strong> role was found in your token. Check Keycloak client roles.
+  </section>
+
+  <section id="events" class="section section-events">
+    <div class="section-header">
+      <h2>Upcoming Events</h2>
+      <p>Browse all available events and find something that interests you</p>
+    </div>
+
+    <!-- Loading State -->
+    <div class="state-container" *ngIf="eventsLoading">
+      <div class="spinner"></div>
+      <p class="state-text">Loading events...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="state-container error" *ngIf="eventsError">
+      <span class="state-icon">❌</span>
+      <p class="state-text">Unable to load events right now. Please try again later.</p>
+    </div>
+
+    <!-- Subscription Error -->
+    <div class="state-container error" *ngIf="subscriptionError">
+      <span class="state-icon">⚠️</span>
+      <p class="state-text">{{ subscriptionError }}</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="state-container" *ngIf="!eventsLoading && !eventsError && events.length === 0">
+      <span class="state-icon">📭</span>
+      <p class="state-text">No events available yet. Check back soon!</p>
+    </div>
+
+    <!-- Events Grid -->
+    <div class="events-grid" *ngIf="!eventsLoading && !eventsError && events.length > 0">
+      <article class="event-card" *ngFor="let event of events">
+        <div class="event-card-header">
+          <div class="event-icon">📅</div>
+          <h3>{{ event.name }}</h3>
+        </div>
+        <p class="event-description">{{ event.description }}</p>
+        <div class="event-meta-container">
+          <div class="event-meta-item">
+            <span class="meta-icon">📍</span>
+            <span>{{ event.location }}</span>
+          </div>
+          <div class="event-meta-item">
+            <span class="meta-icon">🕐</span>
+            <span>{{ event.date | date:'MMM dd, yyyy' }}</span>
+          </div>
+        </div>
+        <div class="event-card-footer">
+          <button 
+            class="subscribe-btn"
+            [class.subscribed]="event.isSubscribed"
+            [disabled]="isLoading(event.id)"
+            (click)="toggleSubscription(event)">
+            {{ isLoading(event.id) ? '⏳ Loading...' : (event.isSubscribed ? '✓ Subscribed' : 'Subscribe') }}
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="features" class="section section-features">
+    <div class="section-header">
+      <h2>Why Join Events?</h2>
+      <p>Here's what makes our events special</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🌐</span>
+        <h3>Diverse Events</h3>
+        <p>From tech conferences to social gatherings, find events that match your interests.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">👥</span>
+        <h3>Community</h3>
+        <p>Connect with like-minded people and expand your professional network.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3>Easy Management</h3>
+        <p>Simple registration process and easy event tracking from your dashboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section section-contact">
+    <div class="section-header">
+      <h2>Get in Touch</h2>
+      <p>Have questions? We'd love to hear from you</p>
+    </div>
+    <form class="contact-form" (submit)="$event.preventDefault()">
+      <div class="form-group">
+        <input type="text" placeholder="Your Name" required />
+      </div>
+      <div class="form-group">
+        <input type="email" placeholder="Your Email" required />
+      </div>
+      <div class="form-group">
+        <textarea rows="5" placeholder="Your Message" required></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Send Message</button>
+    </form>
+  </section>
+
+  <footer class="footer">
+    <p>&copy; 2026 Events Portal. All rights reserved.</p>
+  </footer>
 </div>

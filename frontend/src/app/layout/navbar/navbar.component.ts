@@ -1,4 +1,4 @@
-import { Component, HostListener, Input } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { keycloakService } from '../../services/keycloak.service';
 
 @Component({
@@ -7,8 +7,39 @@ import { keycloakService } from '../../services/keycloak.service';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
-  @Input() userName = 'Account';
-  @Input() userEmail = 'account@example.com';
+  get userName(): string {
+    const p = keycloakService.profile as Record<string, unknown> | undefined;
+    if (!p) {
+      return 'User';
+    }
+    const name = p['name'];
+    if (typeof name === 'string' && name.trim()) {
+      return name.trim();
+    }
+    const given = p['given_name'];
+    const family = p['family_name'];
+    const parts = [given, family].filter((v): v is string => typeof v === 'string' && v.trim().length > 0);
+    if (parts.length) {
+      return parts.join(' ').trim();
+    }
+    const preferred = p['preferred_username'];
+    if (typeof preferred === 'string' && preferred.trim()) {
+      return preferred.trim();
+    }
+    return 'User';
+  }
+
+  get userEmail(): string {
+    const p = keycloakService.profile as Record<string, unknown> | undefined;
+    if (!p) {
+      return '';
+    }
+    const email = p['email'];
+    if (typeof email === 'string' && email.trim()) {
+      return email.trim();
+    }
+    return '';
+  }
 
   accountDropdownOpen = false;
   searchQuery = '';

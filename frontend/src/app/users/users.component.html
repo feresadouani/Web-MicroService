@@ -10,68 +10,88 @@
         <h1>Users</h1>
       </div>
       <button type="button" class="primary-btn" (click)="toggleCreateForm()">
-        {{ showCreateForm ? 'Fermer le formulaire' : 'Ajouter un user' }}
+        {{ showCreateForm ? 'Close form' : 'Add user' }}
       </button>
     </section>
 
     <article class="card" *ngIf="editingUser">
-      <h3>Modifier l’utilisateur</h3>
+      <h3>Edit user</h3>
       <form class="create-form" (submit)="$event.preventDefault(); saveEdit();">
         <input [(ngModel)]="editingUser.firstname" name="edit-firstname" placeholder="Firstname" required />
         <input [(ngModel)]="editingUser.lastname" name="edit-lastname" placeholder="Lastname" required />
         <input [(ngModel)]="editingUser.email" name="edit-email" type="email" placeholder="Email" required />
-        <input
-          [(ngModel)]="editingUser.password"
-          name="edit-password"
-          type="password"
-          placeholder="Nouveau mot de passe (optionnel)"
-        />
+        <div class="field-stack">
+          <input
+            [(ngModel)]="editingUser.password"
+            (ngModelChange)="onEditPasswordChange()"
+            name="edit-password"
+            type="password"
+            placeholder="New password (optional)"
+            pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).+$"
+            title="Use letters, numbers and special characters."
+          />
+          <p class="field-error" *ngIf="editPasswordError">{{ editPasswordError }}</p>
+        </div>
         <select [(ngModel)]="editingUser.role" name="edit-role">
           <option value="USER">USER</option>
           <option value="ADMIN">ADMIN</option>
         </select>
         <div class="form-actions-inline">
-          <button type="submit" class="primary-btn">Enregistrer</button>
-          <button type="button" class="ghost-btn" (click)="cancelEdit()">Annuler</button>
+          <button type="submit" class="primary-btn">Save</button>
+          <button type="button" class="ghost-btn" (click)="cancelEdit()">Cancel</button>
         </div>
       </form>
     </article>
 
     <article class="card" *ngIf="showCreateForm">
-      <h3>Nouveau user</h3>
+      <h3>New user</h3>
       <form class="create-form" (submit)="$event.preventDefault(); createUser();">
         <input [(ngModel)]="newUser.firstname" name="firstname" placeholder="Firstname" required />
         <input [(ngModel)]="newUser.lastname" name="lastname" placeholder="Lastname" required />
         <input [(ngModel)]="newUser.email" name="email" type="email" placeholder="Email" required />
-        <input [(ngModel)]="newUser.password" name="password" type="password" placeholder="Password" required />
+        <input [(ngModel)]="newUser.birthday" name="birthday" type="date" placeholder="Birthday" />
+        <div class="field-stack">
+          <input
+            [(ngModel)]="newUser.password"
+            (ngModelChange)="onCreatePasswordChange()"
+            name="password"
+            type="password"
+            placeholder="Password"
+            required
+            pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).+$"
+            title="Use letters, numbers and special characters."
+          />
+          <p class="field-error" *ngIf="createPasswordError">{{ createPasswordError }}</p>
+        </div>
         <select [(ngModel)]="newUser.role" name="role">
           <option value="USER">USER</option>
           <option value="ADMIN">ADMIN</option>
         </select>
-        <button type="submit" class="primary-btn">Créer</button>
+        <button type="submit" class="primary-btn">Create</button>
       </form>
     </article>
 
     <article class="card">
       <div class="table-header">
-        <h3>Liste des users</h3>
-        <button type="button" class="ghost-btn" (click)="fetchUsers()">Rafraichir</button>
+        <h3>User list</h3>
+        <button type="button" class="ghost-btn" (click)="fetchUsers()">Refresh</button>
       </div>
 
       <form class="search-row" (submit)="$event.preventDefault(); fetchUsers();">
         <input
           [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchQueryChange()"
           name="user-search"
           type="search"
-          placeholder="Rechercher (prénom, nom, email)…"
+          placeholder="Search (first name, last name, email)…"
           autocomplete="off"
         />
-        <button type="submit" class="primary-btn">Rechercher</button>
-        <button type="button" class="ghost-btn" (click)="clearSearch()">Réinitialiser</button>
+        <button type="submit" class="primary-btn">Search</button>
+        <button type="button" class="ghost-btn" (click)="clearSearch()">Reset</button>
       </form>
 
       <p class="error" *ngIf="error">{{ error }}</p>
-      <p *ngIf="loading">Chargement...</p>
+      <p *ngIf="loading">Loading…</p>
 
       <table *ngIf="!loading">
         <thead>
@@ -91,8 +111,8 @@
             <td>{{ user.role || 'USER' }}</td>
             <td class="col-actions">
               <div class="row-actions">
-                <button type="button" class="ghost-btn btn-sm" (click)="startEdit(user)">Modifier</button>
-                <button type="button" class="danger-btn btn-sm" (click)="deleteUser(user)">Supprimer</button>
+                <button type="button" class="ghost-btn btn-sm" (click)="startEdit(user)">Edit</button>
+                <button type="button" class="danger-btn btn-sm" (click)="deleteUser(user)">Delete</button>
               </div>
             </td>
           </tr>
