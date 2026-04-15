@@ -21,6 +21,13 @@ export class Reclamation {
   @Prop({ required: true, trim: true, maxlength: 128 })
   authorSub!: string;
 
+  /** Réponse de l’admin visible par l’utilisateur */
+  @Prop({ trim: true, maxlength: 2000 })
+  reply?: string;
+
+  @Prop()
+  repliedAt?: Date;
+
   @Prop()
   createdAt!: Date;
 

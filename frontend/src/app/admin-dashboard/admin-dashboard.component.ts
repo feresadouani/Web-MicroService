@@ -15,10 +15,8 @@ export class AdminDashboardComponent implements OnInit {
   menuItems: SidebarItem[] = [
     { label: 'Dashboard', route: ['/admin', 'dashboard'] },
     { label: 'Users', route: ['/admin', 'users'] },
-    { label: 'Cours', route: ['/admin', 'cours'] },
     { label: 'Events', route: ['/admin', 'events'] },
-    { label: 'Add Event', route: ['/admin', 'events', 'add'] },
-    { label: 'Reservations', route: ['/admin', 'reservations'] }
+    { label: 'Reclamations', route: ['/admin', 'reclamations'] },
   ];
 
   kpis: { title: string; value: string; trend: string; icon: 'building' | 'chart' | 'money' }[] = [

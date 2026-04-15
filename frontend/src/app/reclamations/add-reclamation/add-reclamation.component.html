@@ -1,0 +1,48 @@
+<section class="page">
+  <app-navbar></app-navbar>
+
+  <article class="card">
+    <header class="card-head">
+      <h1>Add reclamation</h1>
+      <p class="muted">Describe your issue and submit it to the administration.</p>
+    </header>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <p class="success" *ngIf="success">{{ success }}</p>
+
+    <form class="form" (submit)="$event.preventDefault(); submit();">
+      <label class="field">
+        <span>Title</span>
+        <input
+          type="text"
+          name="title"
+          [(ngModel)]="title"
+          maxlength="200"
+          placeholder="Short summary"
+          required
+        />
+      </label>
+
+      <label class="field">
+        <span>Description</span>
+        <textarea
+          name="description"
+          [(ngModel)]="description"
+          rows="6"
+          placeholder="Explain the problem..."
+          required
+        ></textarea>
+      </label>
+
+      <div class="actions">
+        <button class="primary" type="submit" [disabled]="loading">
+          {{ loading ? 'Sending...' : 'Submit reclamation' }}
+        </button>
+        <a class="ghost" routerLink="/event">Cancel</a>
+      </div>
+    </form>
+  </article>
+
+  <app-footer [text]="'© 2026 Reclamations'"></app-footer>
+</section>
+

@@ -2,8 +2,8 @@
 
   <header class="topbar">
     <div class="brand-section">
-      <div class="brand">🎯 Events Portal</div>
-      <p class="brand-subtitle">Discover and join exciting events</p>
+      <div class="brand">📚 Education Portal</div>
+      <p class="brand-subtitle">Learn, practice, and track your progress</p>
     </div>
     <nav class="nav">
       <a href="#features" class="nav-link">About</a>
@@ -11,14 +11,20 @@
       <a routerLink="/reservations" class="nav-link">Reservations</a>
       <a routerLink="/portal/profile" class="nav-link">My Profile</a>
       <a href="#contact" class="nav-link">Contact</a>
+      <a routerLink="/portal" class="nav-link">Home</a>
+      <a routerLink="/event" class="nav-link">Events</a>
+      <a routerLink="/reclamations" class="nav-link">Reclamations</a>
       <button type="button" class="logout-btn" (click)="logout()">Log out</button>
     </nav>
   </header>
   <section class="hero">
     <div class="hero-content">
-      <h1>Welcome to Events</h1>
-      <p>Discover amazing events happening around you. Connect with like-minded people and create unforgettable memories.</p>
-      <a class="cta-primary" href="#events">View Events</a>
+      <h1>Welcome to your learning space</h1>
+      <p>Explore courses, follow learning paths, and keep improving with quizzes and practice.</p>
+      <div class="cta-row">
+        <a class="cta-primary" href="#courses">Browse Courses</a>
+        <a class="cta-secondary" routerLink="/event">Go to Events</a>
+      </div>
     </div>
   </section>
 
@@ -26,62 +32,55 @@
     ⚠️ Warning: no <strong>client_user</strong> role was found in your token. Check Keycloak client roles.
   </section>
 
-  <section id="events" class="section section-events">
+  <section id="courses" class="section section-events">
     <div class="section-header">
-      <h2>Upcoming Events</h2>
-      <p>Browse all available events and find something that interests you</p>
+      <h2>Featured Courses</h2>
+      <p>Pick a topic and start learning today</p>
     </div>
 
-    <!-- Loading State -->
-    <div class="state-container" *ngIf="eventsLoading">
-      <div class="spinner"></div>
-      <p class="state-text">Loading events...</p>
-    </div>
-
-    <!-- Error State -->
-    <div class="state-container error" *ngIf="eventsError">
-      <span class="state-icon">❌</span>
-      <p class="state-text">Unable to load events right now. Please try again later.</p>
-    </div>
-
-    <!-- Subscription Error -->
-    <div class="state-container error" *ngIf="subscriptionError">
-      <span class="state-icon">⚠️</span>
-      <p class="state-text">{{ subscriptionError }}</p>
-    </div>
-
-    <!-- Empty State -->
-    <div class="state-container" *ngIf="!eventsLoading && !eventsError && events.length === 0">
-      <span class="state-icon">📭</span>
-      <p class="state-text">No events available yet. Check back soon!</p>
-    </div>
-
-    <!-- Events Grid -->
-    <div class="events-grid" *ngIf="!eventsLoading && !eventsError && events.length > 0">
-      <article class="event-card" *ngFor="let event of events">
+    <div class="events-grid">
+      <article class="event-card">
         <div class="event-card-header">
-          <div class="event-icon">📅</div>
-          <h3>{{ event.name }}</h3>
+          <div class="event-icon">🧠</div>
+          <h3>Algorithms & Data Structures</h3>
         </div>
-        <p class="event-description">{{ event.description }}</p>
+        <p class="event-description">Master the core concepts with step-by-step lessons and practice exercises.</p>
         <div class="event-meta-container">
-          <div class="event-meta-item">
-            <span class="meta-icon">📍</span>
-            <span>{{ event.location }}</span>
-          </div>
-          <div class="event-meta-item">
-            <span class="meta-icon">🕐</span>
-            <span>{{ event.date | date:'MMM dd, yyyy' }}</span>
-          </div>
+          <div class="event-meta-item"><span class="meta-icon">⏱️</span><span>12 hours</span></div>
+          <div class="event-meta-item"><span class="meta-icon">🎯</span><span>Beginner → Intermediate</span></div>
         </div>
         <div class="event-card-footer">
-          <button 
-            class="subscribe-btn"
-            [class.subscribed]="event.isSubscribed"
-            [disabled]="isLoading(event.id)"
-            (click)="toggleSubscription(event)">
-            {{ isLoading(event.id) ? '⏳ Loading...' : (event.isSubscribed ? '✓ Subscribed' : 'Subscribe') }}
-          </button>
+          <a class="subscribe-btn" href="#features">Start learning</a>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-card-header">
+          <div class="event-icon">💻</div>
+          <h3>Web Development</h3>
+        </div>
+        <p class="event-description">Build modern applications with HTML, CSS, TypeScript, and Angular fundamentals.</p>
+        <div class="event-meta-container">
+          <div class="event-meta-item"><span class="meta-icon">⏱️</span><span>18 hours</span></div>
+          <div class="event-meta-item"><span class="meta-icon">🧩</span><span>Projects included</span></div>
+        </div>
+        <div class="event-card-footer">
+          <a class="subscribe-btn" href="#features">Start learning</a>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-card-header">
+          <div class="event-icon">🔐</div>
+          <h3>Security Basics</h3>
+        </div>
+        <p class="event-description">Understand authentication, tokens, and safe API usage with practical examples.</p>
+        <div class="event-meta-container">
+          <div class="event-meta-item"><span class="meta-icon">⏱️</span><span>9 hours</span></div>
+          <div class="event-meta-item"><span class="meta-icon">✅</span><span>Quiz after each module</span></div>
+        </div>
+        <div class="event-card-footer">
+          <a class="subscribe-btn" href="#features">Start learning</a>
         </div>
       </article>
     </div>
@@ -89,32 +88,32 @@
 
   <section id="features" class="section section-features">
     <div class="section-header">
-      <h2>Why Join Events?</h2>
-      <p>Here's what makes our events special</p>
+      <h2>Why learn here?</h2>
+      <p>A simple education experience focused on progress</p>
     </div>
     <div class="features-grid">
       <div class="feature-card">
-        <span class="feature-icon">🌐</span>
-        <h3>Diverse Events</h3>
-        <p>From tech conferences to social gatherings, find events that match your interests.</p>
+        <span class="feature-icon">🧭</span>
+        <h3>Learning paths</h3>
+        <p>Follow curated paths and know exactly what to learn next.</p>
       </div>
       <div class="feature-card">
-        <span class="feature-icon">👥</span>
-        <h3>Community</h3>
-        <p>Connect with like-minded people and expand your professional network.</p>
+        <span class="feature-icon">📝</span>
+        <h3>Quizzes & practice</h3>
+        <p>Short quizzes and exercises help you retain knowledge faster.</p>
       </div>
       <div class="feature-card">
-        <span class="feature-icon">⚡</span>
-        <h3>Easy Management</h3>
-        <p>Simple registration process and easy event tracking from your dashboard.</p>
+        <span class="feature-icon">📈</span>
+        <h3>Progress tracking</h3>
+        <p>Track your progress and revisit what you need to improve.</p>
       </div>
     </div>
   </section>
 
   <section id="contact" class="section section-contact">
     <div class="section-header">
-      <h2>Get in Touch</h2>
-      <p>Have questions? We'd love to hear from you</p>
+      <h2>Need help?</h2>
+      <p>Send us a message or create a reclamation</p>
     </div>
     <form class="contact-form" (submit)="$event.preventDefault()">
       <div class="form-group">
@@ -128,9 +127,12 @@
       </div>
       <button type="submit" class="submit-btn">Send Message</button>
     </form>
+    <div class="cta-help">
+      <a class="cta-secondary" routerLink="/reclamations/add">Create a reclamation</a>
+    </div>
   </section>
 
   <footer class="footer">
-    <p>&copy; 2026 Events Portal. All rights reserved.</p>
+    <p>&copy; 2026 Education Portal. All rights reserved.</p>
   </footer>
 </div>

@@ -7,6 +7,10 @@ import { keycloakService } from '../../services/keycloak.service';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
+  get isAdmin(): boolean {
+    return keycloakService.isAdmin();
+  }
+
   get userName(): string {
     const p = keycloakService.profile as Record<string, unknown> | undefined;
     if (!p) {

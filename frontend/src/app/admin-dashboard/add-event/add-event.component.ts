@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EventService } from '../../services/event.service';
 import { Event } from '../../models/event.model';
+import { Router } from '@angular/router';
+import { SidebarItem } from '../../layout/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-add-event',
@@ -9,6 +11,13 @@ import { Event } from '../../models/event.model';
   styleUrls: ['./add-event.component.css']
 })
 export class AddEventComponent implements OnInit {
+  menuItems: SidebarItem[] = [
+    { label: 'Dashboard', route: ['/admin', 'dashboard'] },
+    { label: 'Users', route: ['/admin', 'users'] },
+    { label: 'Events', route: ['/admin', 'events'] },
+    { label: 'Reclamations', route: ['/admin', 'reclamations'] }
+  ];
+
   eventForm!: FormGroup;
   isLoading = false;
   successMessage = '';
@@ -18,7 +27,8 @@ export class AddEventComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private eventService: EventService
+    private eventService: EventService,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -53,9 +63,8 @@ export class AddEventComponent implements OnInit {
         this.isLoading = false;
         this.showSuccess('Event added successfully!');
         this.eventForm.reset();
-        setTimeout(() => {
-          this.showSuccessAlert = false;
-        }, 5000);
+        // Redirect back to the events list
+        setTimeout(() => void this.router.navigate(['/admin', 'events']), 400);
       },
       error: (error) => {
         this.isLoading = false;
@@ -90,9 +99,8 @@ export class AddEventComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.eventForm.reset();
-    this.showSuccessAlert = false;
-    this.showErrorAlert = false;
+    // Cancel should go back to events list
+    void this.router.navigate(['/admin', 'events']);
   }
 
   get name() {
